@@ -101,9 +101,9 @@ get_boxplot_ans <- function(df, outliers, legend_count, answer,
   p <- ggplot(df, aes_string(x="Treatment", y=column, fill="Treatment")) +
     geom_boxplot() +
     ggtitle(plot_title) +
-    scale_x_discrete(labels=c("1"="None", "2"="LO",
-                              "3"="LG",
-                              "4"="SLG")) +
+    scale_x_discrete(labels=c("1"="None", "2"="StLO",
+                              "3"="StLG",
+                              "4"="SeLG")) +
     theme(axis.title.y = element_blank()) +
     scale_fill_discrete(name="NAs", labels=legend_count)
   
@@ -159,8 +159,8 @@ get_aggre_df <- function(df1, df2, df3, df4,
   
   TreatmentNames <- plyr::mapvalues(df$Treatment,
                                     from = c("1", "2", "3", "4"),
-                                    to = c("None", "LO", "LG", "SLG")) %>%
-    factor(levels = c("None", "LO", "LG", "SLG"))
+                                    to = c("None", "StLO", "StLG", "SeLG")) %>%
+    factor(levels = c("None", "StLO", "StLG", "SeLG"))
     
   df <- df %>% mutate(Treatment = TreatmentNames)
   
@@ -175,9 +175,9 @@ get_aggre_plot <- function(df,  plot_title) {
     #             fill = "#93a1a1",
     #             scale = "width") +
     geom_boxplot(width = 0.6) +
-    scale_x_discrete(labels=c("1"="None", "2"="LO",
-                              "3"="LG",
-                              "4"="SLG")) +
+    scale_x_discrete(labels=c("1"="None", "2"="StLO",
+                              "3"="StLG",
+                              "4"="SeLG")) +
     theme_bw() +
     theme(axis.title.y = element_blank(),
           plot.title = element_text(size=10)) +
