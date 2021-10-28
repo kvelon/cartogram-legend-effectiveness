@@ -277,8 +277,8 @@ dczo_all_time <- bind_rows(dczo1_time[-dczo1_NA_indices, ],
 
 dczo_all_time$Treatment <- plyr::mapvalues(dczo_all_time$Treatment,
                                            from = c("1", "2", "3", "4"),
-                                           to = c("None", "LO", "LG", "SLG")) %>%
-  factor(levels = c("None", "LO", "LG", "SLG"))
+                                           to = c("None", "StLO", "StLG", "SeLG")) %>%
+  factor(levels = c("None", "StLO", "StLG", "SeLG"))
 
 # Statistical Analysis
 kw_time <- get_kruskal_time(dczo_all_time) # p.value = 0.00083
@@ -367,7 +367,7 @@ pairwise_effect_ci <- function(NA_all, pair) {
                tsmethod = "central", conf.int = TRUE, conf.level = 0.95)
 }
 
-pairwise_effect_ci(dczo_NA_all, c("None", "SLG"))
+pairwise_effect_ci(dczo_NA_all, c("None", "SeLG"))
 
 # Combined plot
 title <-
