@@ -232,7 +232,7 @@ estau_NA_all <- bind_rows(estau1[, c("treatment", "participant_id", "answer")],
                           estau3[, c("treatment", "participant_id", "answer")], 
                           estau4[, c("treatment", "participant_id", "answer")])
 
-estau_NA_all$answer <- factor(as.character(estau_all$answer))
+estau_NA_all$answer <- factor(as.character(estau_NA_all$answer))
 
 cqtest <- cochran_qtest(estau_NA_all, answer ~ treatment | participant_id)
 cqtest$p.value <- cqtest$p
