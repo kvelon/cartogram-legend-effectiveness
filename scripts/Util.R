@@ -182,7 +182,7 @@ get_aggre_plot <- function(df,  plot_title) {
     theme(axis.title.y = element_blank(),
           plot.title = element_text(size=10)) +
     theme(legend.position = "none") +
-    ggtitle("Normalised Responses:",
+    ggtitle("Normalized Responses:",
             plot_title)
   
   return(p)

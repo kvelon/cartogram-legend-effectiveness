@@ -232,7 +232,7 @@ estau_NA_all <- bind_rows(estau1[, c("treatment", "participant_id", "answer")],
                           estau3[, c("treatment", "participant_id", "answer")], 
                           estau4[, c("treatment", "participant_id", "answer")])
 
-estau_NA_all$answer <- factor(as.character(estau_NA_all$answer))
+#estau_NA_all$answer <- factor(as.character(estau_NA_all$answer))
 
 cqtest <- cochran_qtest(estau_NA_all, answer ~ treatment | participant_id)
 cqtest$p.value <- cqtest$p
@@ -333,73 +333,3 @@ hist(estau_all$Normal[estau_all$Treatment == "None"],
      main = "Histogram for None Treatment",
      xlab = "Normalised Responses")
 
-IQR(estau_all$Normal[estau_all$Treatment == "None"], na.rm = TRUE)
-IQR(estau_all$Normal[estau_all$Treatment == "LO"], na.rm = TRUE)
-IQR(estau_all$Normal[estau_all$Treatment == "LG"], na.rm = TRUE)
-IQR(estau_all$Normal[estau_all$Treatment == "SLG"], na.rm = TRUE)
-
-median(estau_all$Normal[estau_all$Treatment == "None"], na.rm = TRUE)
-median(estau_all$Normal[estau_all$Treatment == "LO"], na.rm = TRUE)
-median(estau_all$Normal[estau_all$Treatment == "LG"], na.rm = TRUE)
-median(estau_all$Normal[estau_all$Treatment == "SLG"], na.rm = TRUE)
-
-# Test for difference in variance
-estau_all %>% levene_test(Normal ~ Treatment, center = "mean")
-
-bf.test(Normal ~ Treatment, data = estau_all)
-homog.test(Normal ~ Treatment, data = estau_all, method = c("Levene"))
-
-# Test for tendency to underestimate
-wilcox.test(estau_all$Normal[estau_all$Treatment == "None"],
-            mu = 0,
-            alternative = "less")
-
-wilcox.test(estau_all$Normal[estau_all$Treatment == "LO"],
-            mu = 0,
-            alternative = "less")
-
-wilcox.test(estau_all$Normal[estau_all$Treatment == "LG"],
-            mu = 0,
-            alternative = "less")
-
-wilcox.test(estau_all$Normal[estau_all$Treatment == "SLG"],
-            mu = 0,
-            alternative = "less")
-
-shapiro.test(estau_all$Normal[estau_all$Treatment == "None"])
-shapiro.test(estau_all$Normal[estau_all$Treatment == "LO"])
-shapiro.test(estau_all$Normal[estau_all$Treatment == "LG"])
-shapiro.test(estau_all$Normal[estau_all$Treatment == "SLG"])
-
-t.test(estau_all$Normal[estau_all$Treatment == "LO"],
-       mu = 0,
-       alternative = "less")
-
-t.test(estau_all$Normal[estau_all$Treatment == "LG"],
-       mu = 0,
-       alternative = "less")
-
-t.test(estau_all$Normal[estau_all$Treatment == "SLG"],
-       mu = 0,
-       alternative = "less")
-
-
-########################################
-#               Unused                 #
-########################################
-
-# Grouped boxplot
-# pgrouped <- get_grouped_ans(estau1, estau2, estau3, estau4,
-#                             estau1_answer, estau2_answer,
-#                             estau3_answer, estau4_answer,
-#                             estau1_outliers, estau2_outliers,
-#                             estau3_outliers, estau4_outliers,
-#                             estau1_NA, estau2_NA,
-#                             estau3_NA, estau4_NA,
-#                             "Estimate AU Grouped")[[2]]
-# 
-# tgrouped <- get_grouped_time(estau1_time, estau2_time,
-#                              estau3_time, estau4_time,
-#                              estau1_outliers, estau2_outliers,
-#                              estau3_outliers, estau4_outliers,
-#                              "Response Time Grouped (Seconds)")
