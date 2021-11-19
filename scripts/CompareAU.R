@@ -347,8 +347,8 @@ comau_all_time <- bind_rows(comau1_time[-comau1_NA_indices, ],
 
 comau_all_time$Treatment <- plyr::mapvalues(comau_all_time$Treatment,
                                             from = c("1", "2", "3", "4"),
-                                            to = c("None", "LO", "LG", "SLG")) %>%
-  factor(levels = c("None", "LO", "LG", "SLG"))
+                                            to = c("None", "StLO", "StLG", "SeLG")) %>%
+  factor(levels = c("None", "StLO", "StLG", "SeLG"))
 
 # Statistical Analysis
 kw_time <- get_kruskal_time(comau_all_time) # p.value = 0.004511
@@ -375,12 +375,10 @@ comau_time_pairwise <- pairwise_wilcox_test(comau_all_time,
 tall <- tall + stat_pvalue_manual(comau_time_pairwise,
                                   label = "p.adj.signif",
                                   hide.ns = TRUE,
-                                  y.position = c(230, 250))
+                                  y.position = c(230, 250, 270))
 
 # NA Analysis ----------------------------------------
 comau_NA_count <- comau1_NA_count + comau2_NA_count + comau3_NA_count + comau4_NA_count
-# comau_Xsq <- get_chisq(comau_NA_count)    # pval = 4.17e-14
-# get_pairwise_results(comau_NA_count)
 
 comau_NA_all <- bind_rows(comau1[, c("treatment", "participant_id", "answer")], 
                           comau2[, c("treatment", "participant_id", "answer")], 
@@ -398,7 +396,6 @@ pbar_title <- chi2_and_main_p(cqtest)
 pbar <- get_NA_barplot(comau_NA_count, pbar_title)
 
 # Plot significant p-values for NA barplot
-
 
 comau_pairwise_mcnemar <- pairwise_mcnemar_test(comau_NA_all, 
                                                answer ~ treatment | participant_id,
@@ -477,25 +474,3 @@ for (i in treatments) {
   print(c("Treatment", i))
   print(summary(comau_all_time[comau_all_time$Treatment == i, "Time"]))
 }
-
-
-########################################
-#               Unused                 #
-########################################
-
-# Grouped 
-pgrouped <- get_grouped_ans(comau1, comau2, comau3, comau4,
-                            comau1_answer, comau2_answer,
-                            comau3_answer, comau4_answer,
-                            comau1_NA_indices, comau2_NA_indices,
-                            comau3_NA_indices, comau4_outliers,
-                            comau1_NA_count, comau2_NA_count,
-                            comau3_NA_count, comau4_NA_count,
-                            "Compare AU", "Flipped")[[2]]
-
-tgrouped <- get_grouped_time(comau1_time, comau2_time,
-                             comau3_time, comau4_time,
-                             comau1_NA_indices, comau2_NA_indices,
-                             comau3_NA_indices, comau4_outliers,
-                             "Response Time Grouped (Seconds)")
-

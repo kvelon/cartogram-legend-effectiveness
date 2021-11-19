@@ -328,15 +328,6 @@ pbar_title <- chi2_and_main_p(cqtest)
 
 pbar <- get_NA_barplot(comzo_NA_count, pbar_title)
 
-# Plot significant p-values for NA barplot
-# comzo_NonNA <- 44 - comzo_NA_count
-# comzo_NA_df <- data.frame("NA" = comzo_NA_count,
-#                           "Non-NA" = comzo_NonNA,
-#                           row.names = c("None", "LO", "LG", "SLG"))
-# 
-# comzo_NA_pairwise <- pairwise_prop_test(comzo_NA_df,
-#                                         p.adjust.method = "holm")
-
 comzo_pairwise_mcnemar <- pairwise_mcnemar_test(comzo_NA_all, 
                                                 answer ~ treatment | participant_id,
                                                 p.adjust.method = "holm") %>%
@@ -413,23 +404,3 @@ for (i in treatments) {
   print(c("Treatment", i))
   print(summary(comzo_all_time[comzo_all_time$Treatment == i, "Time"]))
 }
-
-########################################
-#               Unused                 #
-########################################
-
-# Grouped 
-pgrouped <- get_grouped_ans(comzo1, comzo2, comzo3, comzo4,
-                            comzo1_answer, comzo2_answer,
-                            comzo3_answer, comzo4_answer,
-                            comzo1_NA_indices, comzo2_NA_indices,
-                            comzo3_outliers, comzo4_NA_indices,
-                            comzo1_NA_count, comzo2_NA_count,
-                            comzo3_NA_count, comzo4_NA_count,
-                            "Compare Zone", "Flipped")[[2]]
-
-tgrouped <- get_grouped_time(comzo1_time, comzo2_time,
-                             comzo3_time, comzo4_time,
-                             comzo1_NA_indices, comzo2_NA_indices,
-                             comzo3_outliers, comzo4_NA_indices,
-                             "Response Time Grouped (Seconds)")

@@ -349,10 +349,10 @@ pairwise_effect_ci <- function(NA_all, pair) {
                tsmethod = "central", conf.int = TRUE, conf.level = 0.95)
 }
 
-pairwise_effect_ci(dcau_NA_all, c("None", "LO"))
-pairwise_effect_ci(dcau_NA_all, c("None", "LG"))
-pairwise_effect_ci(dcau_NA_all, c("None", "SLG"))
-pairwise_effect_ci(dcau_NA_all, c("LO", "SLG"))
+pairwise_effect_ci(dcau_NA_all, c("None", "StLO"))
+pairwise_effect_ci(dcau_NA_all, c("None", "StLG"))
+pairwise_effect_ci(dcau_NA_all, c("None", "SeLG"))
+pairwise_effect_ci(dcau_NA_all, c("StLO", "SeLG"))
 
 ## END OF CIs
 #################################################
