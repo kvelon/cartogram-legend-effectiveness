@@ -356,7 +356,7 @@ pairwise_effect_ci <- function(NA_all, pair) {
   
   m <- NA_all %>%
     filter(treatment %in% pair) %>%
-    group_by(factor(treatment, levels = rev(treatments))) %>%
+    group_by(factor(treatment, levels = treatments)) %>%
     summarise(nores = sum(answer == TRUE),
               gotres = sum(!answer == TRUE)) %>%
     select(-1) %>%
@@ -408,24 +408,3 @@ for (i in treatments) {
   print(c("Treatment", i))
   print(summary(dczo_all_time[dczo_all_time$Treatment == i, "Time"]))
 }
-
-
-########################################
-#               Unused                 #
-########################################
-
-# Grouped
-pgrouped <- get_grouped_ans(dczo1, dczo2, dczo3, dczo4,
-                            dczo1_answer, dczo2_answer,
-                            dczo3_answer, dczo4_answer,
-                            dczo1_NA_indices, dczo2_outliers,
-                            dczo3_outliers, dczo4_NA_indices,
-                            dczo1_NA_count, dczo2_NA_count,
-                            dczo3_NA_count, dczo4_NA_count,
-                            "Detect Change Zone", "Flipped")[[2]]
-
-tgrouped <- get_grouped_time(dczo1_time, dczo2_time,
-                             dczo3_time, dczo4_time,
-                             dczo1_NA_indices, dczo2_outliers,
-                             dczo3_outliers, dczo4_NA_indices,
-                             "Response Time Aggregated (Seconds)")

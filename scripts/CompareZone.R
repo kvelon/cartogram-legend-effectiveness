@@ -346,7 +346,7 @@ pairwise_effect_ci <- function(NA_all, pair) {
   
   m <- NA_all %>%
     filter(treatment %in% pair) %>%
-    group_by(factor(treatment, levels = rev(treatments))) %>%
+    group_by(factor(treatment, levels = treatments)) %>%
     summarise(nores = sum(answer == TRUE),
               gotres = sum(!answer == TRUE)) %>%
     select(-1) %>%
