@@ -248,6 +248,12 @@ estau_pairwise_mcnemar <- pairwise_mcnemar_test(estau_NA_all,
                                                 p.adjust.method = "holm") %>%
   filter(!is.nan(p))
 
+
+pbar <- pbar + stat_pvalue_manual(estau_pairwise_mcnemar,
+                                  label = "p.adj.signif",
+                                  hide.ns = TRUE,
+                                  y.position = c(57, 50, 71, 64))
+
 ###################################
 # Confidence Interval for NA pairwise results
 ###################################
@@ -272,13 +278,29 @@ pairwise_effect_ci(estau_NA_all, c("None", "SeLG"))
 pairwise_effect_ci(estau_NA_all, c("StLO", "StLG"))
 pairwise_effect_ci(estau_NA_all, c("StLO", "SeLG"))
 
+na_pairwise_effect_ci <- function(NA_all, pair) {
+  
+  m <- NA_all %>%
+    filter(treatment %in% pair) %>%
+    group_by(factor(treatment, levels = treatments)) %>%
+    summarise(nores = sum(answer),
+              gotres = sum(!answer)) %>%
+    select(-1) %>%
+    as.matrix() %>%
+    t()
+  
+    mcnemar.exact(m, conf.level = 0.95)
+}
+
+na_pairwise_effect_ci(estau_NA_all, c("None", "StLG"))
+na_pairwise_effect_ci(estau_NA_all, c("None", "SeLG"))
+na_pairwise_effect_ci(estau_NA_all, c("StLO", "StLG"))
+na_pairwise_effect_ci(estau_NA_all, c("StLO", "SeLG"))
+
+
 ## END OF CIs
 #################################################
 
-pbar <- pbar + stat_pvalue_manual(estau_pairwise_mcnemar,
-                                  label = "p.adj.signif",
-                                  hide.ns = TRUE,
-                                  y.position = c(57, 50, 71, 64))
 
 # Combined plot
 title <-
