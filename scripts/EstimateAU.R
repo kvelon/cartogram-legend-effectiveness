@@ -186,7 +186,7 @@ p4n <- get_boxplot_ans(estau4, estau4_NA_indices, estau4_NA,
 t4 <- get_boxplot_time(estau4_time, estau4_NA_indices)
 
 ###################################
-# Aggregated
+#####   Response Aggregated   #####
 ###################################
 estau_all <- get_aggre_df(estau1, estau2, estau3, estau4,
                           estau1_answer, estau2_answer,
@@ -203,9 +203,10 @@ pall <- get_aggre_plot(estau_all, pall_title)
 pall <- pall + scale_y_continuous(limits = c(-1.5, 1.5)) +
   ylab("(response - correct answer) / correct answer")
 
-# pall <- pall + scale_y_continuous(limits = c(-3, 3))
 
-# Response Time Aggregated --------------------------
+###################################
+#####   Time Aggregated      ######
+###################################
 estau_all_time <- bind_rows(estau1_time[-estau1_NA_indices, ], 
                             estau2_time[-estau2_NA_indices, ],
                             estau3_time[-estau3_NA_indices, ],
@@ -221,10 +222,9 @@ tall <- get_aggre_time(estau1_time, estau2_time,
                        estau3_outliers, estau4_NA_indices,
                        tall_title)
 
-# NA Analysis
-estau_NA <- estau1_NA + estau2_NA + estau3_NA + estau4_NA
-estau_Xsq <- get_chisq(estau_NA)  # pval = 1.98e-08
-get_pairwise_results(estau_NA)
+###################################
+######      NA Aggregated     #####
+###################################
 
 # Cochran Q Test
 estau_NA_all <- bind_rows(estau1[, c("treatment", "participant_id", "answer")], 
@@ -232,7 +232,6 @@ estau_NA_all <- bind_rows(estau1[, c("treatment", "participant_id", "answer")],
                           estau3[, c("treatment", "participant_id", "answer")], 
                           estau4[, c("treatment", "participant_id", "answer")])
 
-#estau_NA_all$answer <- factor(as.character(estau_NA_all$answer))
 
 cqtest <- cochran_qtest(estau_NA_all, answer ~ treatment | participant_id)
 cqtest$p.value <- cqtest$p
@@ -254,42 +253,18 @@ pbar <- pbar + stat_pvalue_manual(estau_pairwise_mcnemar,
                                   hide.ns = TRUE,
                                   y.position = c(57, 50, 71, 64))
 
-###################################
 # Confidence Interval for NA pairwise results
-###################################
 
-pairwise_effect_ci <- function(NA_all, pair) {
+# Function to get pairwise CIs for NA analysis
+na_pairwise_effect_ci <- function(NA_all, two_treatments) {
   
-  m <- NA_all %>%
-    filter(treatment %in% pair) %>%
-    group_by(factor(treatment, levels = treatments)) %>%
-    summarise(nores = sum(answer),
-              gotres = sum(!answer)) %>%
-    select(-1) %>%
-    as.matrix() %>%
-    t()
+  sbset = NA_all[NA_all$treatment %in% two_treatments,
+                 c("treatment", "answer")]
   
-  fisher.exact(m, or = 1, alternative = "two.sided",
-               tsmethod = "central", conf.int = TRUE, conf.level = 0.95)
-}
-
-pairwise_effect_ci(estau_NA_all, c("None", "StLG"))
-pairwise_effect_ci(estau_NA_all, c("None", "SeLG"))
-pairwise_effect_ci(estau_NA_all, c("StLO", "StLG"))
-pairwise_effect_ci(estau_NA_all, c("StLO", "SeLG"))
-
-na_pairwise_effect_ci <- function(NA_all, pair) {
+  sbset$treatment <- factor(sbset$treatment, levels = two_treatments)
   
-  m <- NA_all %>%
-    filter(treatment %in% pair) %>%
-    group_by(factor(treatment, levels = treatments)) %>%
-    summarise(nores = sum(answer),
-              gotres = sum(!answer)) %>%
-    select(-1) %>%
-    as.matrix() %>%
-    t()
+  mcnemar.exact(table(sbset), conf.level = 0.95)
   
-    mcnemar.exact(m, conf.level = 0.95)
 }
 
 na_pairwise_effect_ci(estau_NA_all, c("None", "StLG"))
@@ -297,12 +272,9 @@ na_pairwise_effect_ci(estau_NA_all, c("None", "SeLG"))
 na_pairwise_effect_ci(estau_NA_all, c("StLO", "StLG"))
 na_pairwise_effect_ci(estau_NA_all, c("StLO", "SeLG"))
 
-
-## END OF CIs
-#################################################
-
-
-# Combined plot
+###################################
+######      Combine plots     #####
+###################################
 title <-
   ggdraw() +
   draw_label("Estimate Administrative Unit",

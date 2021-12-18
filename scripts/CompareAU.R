@@ -300,31 +300,6 @@ pall <- get_aggre_plot(comau_all, pall_title)
 
 pall <- pall + scale_y_continuous(limits = c(-3, 3))
 
-# With jitter
-# ntrials <- 1000
-# 
-# res <- numeric(6)
-# 
-# for (i in 1:ntrials) {
-#   simul <- comau_all
-#     
-#   simul$Normal <- jitter(simul$Normal, amount = 0.001)
-#   
-#   p_simul <- pairwise_wilcox_test(simul,
-#                                   Normal ~ Treatment,
-#                                   p.adjust.method = "holm",
-#                                   paired = FALSE)$p.adj
-#   
-#   res <-  res + p_simul
-#   
-#   if (i == ntrials)
-#     res <- res / ntrials
-# }
-# 
-# comau_response_pairwise$p.adj <- res
-
-# Add significant p-values
-
 comau_response_pairwise <- pairwise_wilcox_test(comau_all,
                                                 Normal ~ Treatment,
                                                 p.adjust.method = "holm",
@@ -337,8 +312,9 @@ pall <- pall + stat_pvalue_manual(comau_response_pairwise,
                                   y.position = c(2.4, 2.7),
                                   tip.length = 0.01)
 
-
-# Response Time Aggregated ----------------------------------------
+###################################
+#####   Time Aggregated      ######
+###################################
 
 comau_all_time <- bind_rows(comau1_time[-comau1_NA_indices, ], 
                             comau2_time[-comau2_NA_indices, ],
@@ -377,7 +353,9 @@ tall <- tall + stat_pvalue_manual(comau_time_pairwise,
                                   hide.ns = TRUE,
                                   y.position = c(230, 250, 270))
 
-# NA Analysis ----------------------------------------
+###################################
+######      NA Aggregated     #####
+###################################
 comau_NA_count <- comau1_NA_count + comau2_NA_count + comau3_NA_count + comau4_NA_count
 
 comau_NA_all <- bind_rows(comau1[, c("treatment", "participant_id", "answer")], 
@@ -407,35 +385,30 @@ pbar <- pbar + stat_pvalue_manual(comau_pairwise_mcnemar,
                                   hide.ns = TRUE,
                                   y.position = c(77, 82, 88, 93, 99))
 
-###################################
 # Confidence Interval for NA pairwise results
-###################################
 
-pairwise_effect_ci <- function(NA_all, pair) {
+# Function to get pairwise CIs for NA analysis
+na_pairwise_effect_ci <- function(NA_all, two_treatments) {
   
-  m <- NA_all %>%
-    filter(treatment %in% pair) %>%
-    group_by(factor(treatment, levels = treatments)) %>%
-    summarise(nores = sum(answer == TRUE),
-              gotres = sum(!answer == TRUE)) %>%
-    select(-1) %>%
-    as.matrix() %>%
-    t()
+  sbset = NA_all[NA_all$treatment %in% two_treatments,
+                 c("treatment", "answer")]
   
-  fisher.exact(m, or = 1, alternative = "two.sided",
-               tsmethod = "central", conf.int = TRUE, conf.level = 0.95)
+  sbset$treatment <- factor(sbset$treatment, levels = two_treatments)
+  
+  mcnemar.exact(table(sbset), conf.level = 0.95)
+  
 }
 
-pairwise_effect_ci(comau_NA_all, c("None", "StLO"))
-pairwise_effect_ci(comau_NA_all, c("None", "StLG"))
-pairwise_effect_ci(comau_NA_all, c("None", "SeLG"))
-pairwise_effect_ci(comau_NA_all, c("StLO", "StLG"))
-pairwise_effect_ci(comau_NA_all, c("StLO", "SeLG"))
+na_pairwise_effect_ci(comau_NA_all, c("None", "StLO"))
+na_pairwise_effect_ci(comau_NA_all, c("None", "StLG"))
+na_pairwise_effect_ci(comau_NA_all, c("None", "SeLG"))
+na_pairwise_effect_ci(comau_NA_all, c("StLO", "StLG"))
+na_pairwise_effect_ci(comau_NA_all, c("StLO", "SeLG"))
 
-## END OF CIs
-#################################################
+###################################
+######      Combine plots     #####
+###################################
 
-# Combined plot
 title <-
   ggdraw() +
   draw_label("Compare Administrative Units",

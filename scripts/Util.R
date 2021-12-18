@@ -490,3 +490,15 @@ chi2_and_main_p <- function(test) {
            * .(sprintf("%.2f", test$p.value)))
   }
 }
+
+# Function to get pairwise CIs for NA analysis
+na_pairwise_effect_ci <- function(NA_all, two_treatments) {
+  
+  sbset = NA_all[NA_all$treatment %in% two_treatments,
+                 c("treatment", "answer")]
+  
+  sbset$treatment <- factor(sbset$treatment, levels = two_treatments)
+  
+  mcnemar.exact(table(sbset), conf.level = 0.95)
+  
+}
