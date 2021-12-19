@@ -252,8 +252,9 @@ p4bn <- get_boxplot_ans(dczo4, dczo4_NA_indices, dczo4_NA_count, dczo4_answer,
 t4a <- get_boxplot_time(dczo4_time, dczo4_NA_indices)
 
 ###################################
-# Aggregated
+#####   Response Aggregated   #####
 ###################################
+
 dczo_all <- get_aggre_df(dczo1, dczo2, dczo3, dczo4,
                           dczo1_answer, dczo2_answer,
                           dczo3_answer, dczo4_answer,
@@ -269,7 +270,11 @@ pall <- get_aggre_plot(dczo_all, pall_title)
 
 pall <- pall + scale_y_continuous(limits = c(-3, 3))
 
-# Response Time Aggregated ----------------------------------------
+
+###################################
+#####   Time Aggregated      ######
+###################################
+
 dczo_all_time <- bind_rows(dczo1_time[-dczo1_NA_indices, ], 
                            dczo2_time[-dczo2_outliers, ],
                            dczo3_time[-dczo3_outliers, ], 
@@ -307,10 +312,10 @@ tall <- tall + stat_pvalue_manual(dczo_time_pairwise,
                                   hide.ns = TRUE,
                                   y.position = c(245, 280))
 
-# NA Analysis
-dczo_NA_count <- dczo1_NA_count + dczo2_NA_count + dczo3_NA_count + dczo4_NA_count
-# dczo_Xsq <- get_chisq(dczo_NA_count)    # pval = 0.0149 
-# get_pairwise_results(dczo_NA_count)
+
+###################################
+######      NA Aggregated     #####
+###################################
 
 dczo_NA_all <- bind_rows(dczo1[, c("treatment", "participant_id", "answer")], 
                          dczo2[, c("treatment", "participant_id", "answer")], 
@@ -327,16 +332,6 @@ pbar_title <- chi2_and_main_p(cqtest)
 
 pbar <- get_NA_barplot(dczo_NA_count, pbar_title)
 
-# Plot significant p-values for NA barplot
-
-# dczo_NonNA <- 44 - dczo_NA_count
-# dczo_NA_df <- data.frame("NA" = dczo_NA_count,
-#                           "Non-NA" = dczo_NonNA,
-#                           row.names = c("None", "LO", "LG", "SLG"))
-# 
-# dczo_NA_pairwise <- pairwise_prop_test(dczo_NA_df,
-#                                        p.adjust.method = "holm")
-
 dczo_pairwise_mcnemar <- pairwise_mcnemar_test(dczo_NA_all, 
                                                answer ~ treatment | participant_id,
                                                p.adjust.method = "holm") %>%
@@ -348,28 +343,14 @@ pbar <- pbar + stat_pvalue_manual(dczo_pairwise_mcnemar,
                                   y.position = c(50))
 
 
-###################################
 # Confidence Interval for NA pairwise results
+
+na_pairwise_effect_ci(dczo_NA_all, c("None", "SeLG"))
+
+###################################
+######      Combine plots     #####
 ###################################
 
-pairwise_effect_ci <- function(NA_all, pair) {
-  
-  m <- NA_all %>%
-    filter(treatment %in% pair) %>%
-    group_by(factor(treatment, levels = treatments)) %>%
-    summarise(nores = sum(answer == TRUE),
-              gotres = sum(!answer == TRUE)) %>%
-    select(-1) %>%
-    as.matrix() %>%
-    t()
-  
-  fisher.exact(m, or = 1, alternative = "two.sided",
-               tsmethod = "central", conf.int = TRUE, conf.level = 0.95)
-}
-
-pairwise_effect_ci(dczo_NA_all, c("None", "SeLG"))
-
-# Combined plot
 title <-
   ggdraw() +
   draw_label("Detect Change in Zone",

@@ -258,12 +258,18 @@ pbar <- pbar + stat_pvalue_manual(estau_pairwise_mcnemar,
 # Function to get pairwise CIs for NA analysis
 na_pairwise_effect_ci <- function(NA_all, two_treatments) {
   
-  sbset = NA_all[NA_all$treatment %in% two_treatments,
-                 c("treatment", "answer")]
+  sbset <- NA_all[NA_all$treatment %in% two_treatments, ]
+           
+  sbset <- pivot_wider(sbset, names_from = "treatment",
+                       values_from = "answer")
   
-  sbset$treatment <- factor(sbset$treatment, levels = two_treatments)
+  tble = matrix(0, 2, 2)
+  tble[1, 1] <- sum(!sbset[,two_treatments[1]] & !sbset[,two_treatments[2]])
+  tble[1, 2] <- sum(!sbset[,two_treatments[1]] & sbset[,two_treatments[2]])
+  tble[2, 1] <- sum(sbset[,two_treatments[1]] & !sbset[,two_treatments[2]])
+  tble[2, 2] <- sum(sbset[,two_treatments[1]] & sbset[,two_treatments[2]])
   
-  mcnemar.exact(table(sbset), conf.level = 0.95)
+  mcnemar.exact(tble)
   
 }
 

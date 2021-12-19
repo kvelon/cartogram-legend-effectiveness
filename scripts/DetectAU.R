@@ -252,7 +252,7 @@ p4bn <- get_boxplot_ans(dcau4, dcau4_NA_indices, dcau4_NA, dcau4_answer,
 t4a <- get_boxplot_time(dcau4_time, dcau4_NA_indices)
 
 ###################################
-# Aggregated
+#####   Response Aggregated   #####
 ###################################
 
 dcau_all <- get_aggre_df(dcau1, dcau2, dcau3, dcau4,
@@ -270,7 +270,10 @@ pall <- get_aggre_plot(dcau_all, pall_title)
 
 pall <- pall + scale_y_continuous(limits = c(-3, 3))
 
-# Response Time Aggregated ----------------------------------------
+###################################
+#####   Time Aggregated      ######
+###################################
+
 dcau_all_time <- bind_rows(dcau1_time[-dcau1_NA_indices, ],
                            dcau2_time[-dcau2_NA_indices, ],
                            dcau3_time[-dcau3_NA_indices, ], 
@@ -291,10 +294,10 @@ pairwise.wilcox.test(dcau_all_time$Time,
                      p.adjust.method = "holm",
                      paired = FALSE)  # No significant pairwise differences
 
-# NA Analysis
-dcau_NA <- dcau1_NA + dcau2_NA + dcau3_NA + dcau4_NA
-# dcau_Xsq <- get_chisq(dcau_NA)    # pval = 1.84e-09
-# get_pairwise_results(dcau_NA)
+
+###################################
+######      NA Aggregated     #####
+###################################
 
 dcau_NA_all <- bind_rows(dcau1[, c("treatment", "participant_id", "answer")], 
                          dcau2[, c("treatment", "participant_id", "answer")], 
@@ -310,16 +313,6 @@ cqtest$p.value <- cqtest$p
 pbar_title <- chi2_and_main_p(cqtest)
 pbar <- get_NA_barplot(dcau_NA, pbar_title)
 
-# Plot significant p-values
-
-# dcau_NonNA <- 44 - dcau_NA
-# dcau_NA_df <- data.frame("NA" = dcau_NA,
-#                          "Non-NA" = dcau_NonNA,
-#                          row.names = c("None", "LO", "LG", "SLG"))
-# 
-# dcau_pairwise <- pairwise_prop_test(dcau_NA_df,
-#                                     p.adjust.method = "holm")
-
 dcau_pairwise_mcnemar <- pairwise_mcnemar_test(dcau_NA_all, 
                                                answer ~ treatment | participant_id,
                                                p.adjust.method = "holm") %>%
@@ -334,30 +327,15 @@ pbar <- pbar + stat_pvalue_manual(dcau_pairwise_mcnemar,
 # Confidence Interval for NA pairwise results
 ###################################
 
-pairwise_effect_ci <- function(NA_all, pair) {
-  
-  m <- NA_all %>%
-    filter(treatment %in% pair) %>%
-    group_by(factor(treatment, levels = treatments)) %>%
-    summarise(nores = sum(answer == TRUE),
-              gotres = sum(!answer == TRUE)) %>%
-    select(-1) %>%
-    as.matrix() %>%
-    t()
-  
-  fisher.exact(m, or = 1, alternative = "two.sided",
-               tsmethod = "central", conf.int = TRUE, conf.level = 0.95)
-}
+na_pairwise_effect_ci(dcau_NA_all, c("None", "StLO"))
+na_pairwise_effect_ci(dcau_NA_all, c("None", "StLG"))
+na_pairwise_effect_ci(dcau_NA_all, c("None", "SeLG"))
+na_pairwise_effect_ci(dcau_NA_all, c("StLO", "SeLG"))
 
-pairwise_effect_ci(dcau_NA_all, c("None", "StLO"))
-pairwise_effect_ci(dcau_NA_all, c("None", "StLG"))
-pairwise_effect_ci(dcau_NA_all, c("None", "SeLG"))
-pairwise_effect_ci(dcau_NA_all, c("StLO", "SeLG"))
+###################################
+######      Combine plots     #####
+###################################
 
-## END OF CIs
-#################################################
-
-# Combined plot
 title <-
   ggdraw() +
   draw_label("Detect Change in Administrative Unit",

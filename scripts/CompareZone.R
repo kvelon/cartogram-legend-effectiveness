@@ -250,10 +250,10 @@ p4bn <- get_boxplot_ans(comzo4, comzo4_NA_indices, comzo4_NA_count, comzo4_answe
 
 t4a <- get_boxplot_time(comzo4_time, comzo4_NA_indices)
 
+###################################
+#####   Response Aggregated   #####
+###################################
 
-###################################
-# Aggregated
-###################################
 comzo_all <- get_aggre_df(comzo1, comzo2, comzo3, comzo4,
                           comzo1_answer, comzo2_answer,
                           comzo3_answer, comzo4_answer,
@@ -269,7 +269,9 @@ pall <- get_aggre_plot(comzo_all, pall_title)
 
 pall <- pall + scale_y_continuous(limits = c(-3, 3))
 
-# Response Time Aggregated ----------------------------------------
+###################################
+#####   Time Aggregated      ######
+###################################
 
 comzo_all_time <- bind_rows(comzo1_time[-comzo1_NA_indices, ], 
                             comzo2_time[-comzo2_NA_indices, ],
@@ -308,7 +310,10 @@ tall <- tall + stat_pvalue_manual(comzo_time_pairwise,
                                   hide.ns = TRUE,
                                   y.position = c(230, 250, 270, 290))
 
-# NA Analysis
+###################################
+######      NA Aggregated     #####
+###################################
+
 comzo_NA_count <- comzo1_NA_count + comzo2_NA_count + comzo3_NA_count + comzo4_NA_count
 comzo_Xsq <- get_chisq(comzo_NA_count)    # pval = 6.09e-05
 get_pairwise_results(comzo_NA_count)
@@ -338,34 +343,16 @@ pbar <- pbar + stat_pvalue_manual(comzo_pairwise_mcnemar,
                                   hide.ns = TRUE,
                                   y.position = c(50, 60, 70, 80))
 
-###################################
 # Confidence Interval for NA pairwise results
+na_pairwise_effect_ci(comzo_NA_all, c("None", "StLG"))
+na_pairwise_effect_ci(comzo_NA_all, c("None", "SeLG"))
+na_pairwise_effect_ci(comzo_NA_all, c("StLO", "StLG"))
+na_pairwise_effect_ci(comzo_NA_all, c("StLO", "SeLG"))
+
+###################################
+######      Combine plots     #####
 ###################################
 
-pairwise_effect_ci <- function(NA_all, pair) {
-  
-  m <- NA_all %>%
-    filter(treatment %in% pair) %>%
-    group_by(factor(treatment, levels = treatments)) %>%
-    summarise(nores = sum(answer == TRUE),
-              gotres = sum(!answer == TRUE)) %>%
-    select(-1) %>%
-    as.matrix() %>%
-    t()
-  
-  fisher.exact(m, or = 1, alternative = "two.sided",
-               tsmethod = "central", conf.int = TRUE, conf.level = 0.95)
-}
-
-pairwise_effect_ci(comzo_NA_all, c("None", "StLG"))
-pairwise_effect_ci(comzo_NA_all, c("None", "SeLG"))
-pairwise_effect_ci(comzo_NA_all, c("StLO", "StLG"))
-pairwise_effect_ci(comzo_NA_all, c("StLO", "SeLG"))
-
-## END OF CIs
-#################################################
-
-# Combined plot
 title <-
   ggdraw() +
   draw_label("Compare Zones",
