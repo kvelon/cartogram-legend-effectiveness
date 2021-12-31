@@ -364,7 +364,7 @@ comau_NA_all <- bind_rows(comau1[, c("treatment", "participant_id", "answer")],
                           comau3[, c("treatment", "participant_id", "answer")], 
                           comau4[, c("treatment", "participant_id", "answer")])
 
-comau_NA_all$answer <- factor(as.character(comau_NA_all$answer))
+# comau_NA_all$answer <- factor(as.character(comau_NA_all$answer))
 comau_NA_all$treatment <- factor(comau_NA_all$treatment, levels = treatments)
 
 cqtest <- cochran_qtest(comau_NA_all, answer ~ treatment | participant_id)
@@ -406,11 +406,26 @@ na_pairwise_effect_ci <- function(NA_all, two_treatments) {
   
 }
 
-na_pairwise_effect_ci(comau_NA_all, c("None", "StLO"))
-na_pairwise_effect_ci(comau_NA_all, c("None", "StLG"))
+na_pairwise_effect_ci(comau_NA_all, c("None", "StLO")) 
+na_pairwise_effect_ci(comau_NA_all, c("None", "StLG")) 
 na_pairwise_effect_ci(comau_NA_all, c("None", "SeLG"))
 na_pairwise_effect_ci(comau_NA_all, c("StLO", "StLG"))
 na_pairwise_effect_ci(comau_NA_all, c("StLO", "SeLG"))
+p_none_stlo <- na_pairwise_effect_ci(comau_NA_all, c("None", "StLO"))$p.value
+p_none_stlg <- na_pairwise_effect_ci(comau_NA_all, c("None", "StLG"))$p.value
+p_none_selg <- na_pairwise_effect_ci(comau_NA_all, c("None", "SeLG"))$p.value
+p_stlo_stlg <- na_pairwise_effect_ci(comau_NA_all, c("StLO", "StLG"))$p.value
+p_stlo_selg <- na_pairwise_effect_ci(comau_NA_all, c("StLO", "SeLG"))$p.value
+p_stlg_selg <- na_pairwise_effect_ci(comau_NA_all, c("StLG", "SeLG"))$p.value
+na_pairwise_effect_adj <-
+  tribble(~group1, ~group2, ~p,
+          "None", "StLO", p_none_stlo,
+          "None", "StLG", p_none_stlg,
+          "None", "SeLG", p_none_selg,
+          "StLO", "StLG", p_stlo_stlg,
+          "StLO", "SeLG", p_stlo_selg,
+          "StLG", "SeLG", p_stlg_selg) |>
+  mutate(p_adj = p.adjust(p, method = "holm"))
 
 ###################################
 ######      Combine plots     #####
