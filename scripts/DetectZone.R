@@ -316,13 +316,13 @@ tall <- tall + stat_pvalue_manual(dczo_time_pairwise,
 ###################################
 ######      NA Aggregated     #####
 ###################################
+dczo_NA_count <- dczo1_NA_count + dczo2_NA_count + dczo3_NA_count + dczo4_NA_count
 
 dczo_NA_all <- bind_rows(dczo1[, c("treatment", "participant_id", "answer")], 
                          dczo2[, c("treatment", "participant_id", "answer")], 
                          dczo3[, c("treatment", "participant_id", "answer")], 
                          dczo4[, c("treatment", "participant_id", "answer")])
 
-# dczo_NA_all$answer <- factor(as.character(dczo_NA_all$answer))
 dczo_NA_all$treatment <- factor(dczo_NA_all$treatment, levels = treatments)
 
 cqtest <- cochran_qtest(dczo_NA_all, answer ~ treatment | participant_id)
@@ -330,44 +330,19 @@ cqtest$p.value <- cqtest$p
 
 pbar_title <- chi2_and_main_p(cqtest)
 
-# pbar <- get_NA_barplot(dczo_NA_count, pbar_title)
-
-dczo_pairwise_mcnemar <- pairwise_mcnemar_test(dczo_NA_all, 
-                                               answer ~ treatment | participant_id,
-                                               p.adjust.method = "holm") %>%
-  filter(!is.nan(p))
-
-# pbar <- pbar + stat_pvalue_manual(dczo_pairwise_mcnemar,
-#                                   label = "p.adj.signif",
-#                                   hide.ns = TRUE,
-#                                   y.position = c(50))
-
+pbar <- get_NA_barplot(dczo_NA_count, pbar_title)
 
 # Confidence Interval for NA pairwise results
-# Function to get pairwise CIs for NA analysis
-na_pairwise_effect_ci <- function(NA_all, two_treatments) {
-  
-  sbset <- NA_all[NA_all$treatment %in% two_treatments, ]
-  sbset$answer <- as.logical(sbset$answer)
-  sbset <- pivot_wider(sbset, names_from = "treatment",
-                       values_from = "answer")
-  
-  tble = matrix(0, 2, 2)
-  tble[1, 1] <- sum(!sbset[,two_treatments[1]] & !sbset[,two_treatments[2]])
-  tble[1, 2] <- sum(!sbset[,two_treatments[1]] & sbset[,two_treatments[2]])
-  tble[2, 1] <- sum(sbset[,two_treatments[1]] & !sbset[,two_treatments[2]])
-  tble[2, 2] <- sum(sbset[,two_treatments[1]] & sbset[,two_treatments[2]])
-  
-  mcnemar.exact(tble)
-  
-}
 na_pairwise_effect_ci(dczo_NA_all, c("None", "SeLG"))
+
+# Adjusted p-values
 p_none_stlo <- na_pairwise_effect_ci(dczo_NA_all, c("None", "StLO"))$p.value
 p_none_stlg <- na_pairwise_effect_ci(dczo_NA_all, c("None", "StLG"))$p.value
 p_none_selg <- na_pairwise_effect_ci(dczo_NA_all, c("None", "SeLG"))$p.value
 p_stlo_stlg <- na_pairwise_effect_ci(dczo_NA_all, c("StLO", "StLG"))$p.value
 p_stlo_selg <- na_pairwise_effect_ci(dczo_NA_all, c("StLO", "SeLG"))$p.value
 p_stlg_selg <- na_pairwise_effect_ci(dczo_NA_all, c("StLG", "SeLG"))$p.value
+
 na_pairwise_effect_adj <-
   tribble(~group1, ~group2, ~p,
           "None", "StLO", p_none_stlo,
@@ -376,7 +351,15 @@ na_pairwise_effect_adj <-
           "StLO", "StLG", p_stlo_stlg,
           "StLO", "SeLG", p_stlo_selg,
           "StLG", "SeLG", p_stlg_selg) |>
-  mutate(p_adj = p.adjust(p, method = "holm"))
+  mutate(p_adj = p.adjust(p, method = "holm"),
+         stars = get_stars(p_adj))
+
+# Plot significant p-values
+pbar <- pbar + stat_pvalue_manual(na_pairwise_effect_adj,
+                                  label = "stars",
+                                  hide.ns = TRUE,
+                                  y.position = c(150, 60, 160))
+
 
 ###################################
 ######      Combine plots     #####
@@ -389,13 +372,13 @@ title <-
              size = 15) +
   theme(plot.background = element_rect(fill = "#e6e6e6", color = NA)) 
 
-# bottom_row <- plot_grid(pall, tall, pbar, ncol = 3, rel_heights = c(3/10, 4/10, 4/10))
-# pcombined <- plot_grid(title,
-#                        bottom_row,
-#                        nrow = 2,
-#                        rel_heights = c(0.12, 1))
+bottom_row <- plot_grid(pall, tall, pbar, ncol = 3, rel_heights = c(3/10, 4/10, 4/10))
+pcombined <- plot_grid(title,
+                       bottom_row,
+                       nrow = 2,
+                       rel_heights = c(0.12, 1))
 
-#saveRDS(pcombined, file = "../rdata/Combined_DCZo.rds")
+saveRDS(pcombined, file = "../rdata/Combined_DCZo.rds")
 #ggsave("Combined_DCZo.pdf", pcombined, path = "../plots/", width = 6, height = 4)
 
 ###################################

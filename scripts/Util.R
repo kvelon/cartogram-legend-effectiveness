@@ -509,3 +509,21 @@ na_pairwise_effect_ci <- function(NA_all, two_treatments) {
   mcnemar.exact(tble)
   
 }
+
+# Function to get vector of significant stars from vector of p_values
+get_stars <- function(pvals) {
+  
+  pval_to_star <- function(pval) {
+    if (pval <= 0.0001)
+      return("****")
+    else if (pval <= 0.001)
+      return("***")
+    else if (pval <= 0.01)
+      return("**")
+    else if (pval <= 0.05)
+      return("*")
+    else
+      return("ns")
+  }
+  return(map_chr(pvals, pval_to_star))
+}

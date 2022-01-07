@@ -364,7 +364,6 @@ comau_NA_all <- bind_rows(comau1[, c("treatment", "participant_id", "answer")],
                           comau3[, c("treatment", "participant_id", "answer")], 
                           comau4[, c("treatment", "participant_id", "answer")])
 
-# comau_NA_all$answer <- factor(as.character(comau_NA_all$answer))
 comau_NA_all$treatment <- factor(comau_NA_all$treatment, levels = treatments)
 
 cqtest <- cochran_qtest(comau_NA_all, answer ~ treatment | participant_id)
@@ -374,49 +373,22 @@ pbar_title <- chi2_and_main_p(cqtest)
 
 pbar <- get_NA_barplot(comau_NA_count, pbar_title)
 
-# Plot significant p-values for NA barplot
-
-comau_pairwise_mcnemar <- pairwise_mcnemar_test(comau_NA_all, 
-                                               answer ~ treatment | participant_id,
-                                               p.adjust.method = "holm") %>%
-  filter(!is.nan(p))
-
-pbar <- pbar + stat_pvalue_manual(comau_pairwise_mcnemar,
-                                  label = "p.adj.signif",
-                                  hide.ns = TRUE,
-                                  y.position = c(77, 82, 88, 93, 99))
-
 # Confidence Interval for NA pairwise results
-
-# Function to get pairwise CIs for NA analysis
-na_pairwise_effect_ci <- function(NA_all, two_treatments) {
-  
-  sbset <- NA_all[NA_all$treatment %in% two_treatments, ]
-  sbset$answer <- as.logical(sbset$answer)
-  sbset <- pivot_wider(sbset, names_from = "treatment",
-                       values_from = "answer")
-  
-  tble = matrix(0, 2, 2)
-  tble[1, 1] <- sum(!sbset[,two_treatments[1]] & !sbset[,two_treatments[2]])
-  tble[1, 2] <- sum(!sbset[,two_treatments[1]] & sbset[,two_treatments[2]])
-  tble[2, 1] <- sum(sbset[,two_treatments[1]] & !sbset[,two_treatments[2]])
-  tble[2, 2] <- sum(sbset[,two_treatments[1]] & sbset[,two_treatments[2]])
-  
-  mcnemar.exact(tble)
-  
-}
 
 na_pairwise_effect_ci(comau_NA_all, c("None", "StLO")) 
 na_pairwise_effect_ci(comau_NA_all, c("None", "StLG")) 
 na_pairwise_effect_ci(comau_NA_all, c("None", "SeLG"))
 na_pairwise_effect_ci(comau_NA_all, c("StLO", "StLG"))
 na_pairwise_effect_ci(comau_NA_all, c("StLO", "SeLG"))
+
+# Adjusted p-values
 p_none_stlo <- na_pairwise_effect_ci(comau_NA_all, c("None", "StLO"))$p.value
 p_none_stlg <- na_pairwise_effect_ci(comau_NA_all, c("None", "StLG"))$p.value
 p_none_selg <- na_pairwise_effect_ci(comau_NA_all, c("None", "SeLG"))$p.value
 p_stlo_stlg <- na_pairwise_effect_ci(comau_NA_all, c("StLO", "StLG"))$p.value
 p_stlo_selg <- na_pairwise_effect_ci(comau_NA_all, c("StLO", "SeLG"))$p.value
 p_stlg_selg <- na_pairwise_effect_ci(comau_NA_all, c("StLG", "SeLG"))$p.value
+
 na_pairwise_effect_adj <-
   tribble(~group1, ~group2, ~p,
           "None", "StLO", p_none_stlo,
@@ -425,7 +397,15 @@ na_pairwise_effect_adj <-
           "StLO", "StLG", p_stlo_stlg,
           "StLO", "SeLG", p_stlo_selg,
           "StLG", "SeLG", p_stlg_selg) |>
-  mutate(p_adj = p.adjust(p, method = "holm"))
+  mutate(p_adj = p.adjust(p, method = "holm"),
+         stars = get_stars(p_adj))
+
+# Plot significant p-values for NA barplot
+
+pbar <- pbar + stat_pvalue_manual(na_pairwise_effect_adj,
+                                  label = "stars",
+                                  hide.ns = TRUE,
+                                  y.position = c(77, 82, 88, 93, 99))
 
 ###################################
 ######      Combine plots     #####
@@ -444,7 +424,7 @@ pcombined <- plot_grid(title,
                        nrow = 2,
                        rel_heights = c(0.12, 1))
 
-#saveRDS(pcombined, file = "../rdata/Combined_ComAU.rds")
+# saveRDS(pcombined, file = "../rdata/Combined_ComAU.rds")
 #ggsave("Combined_ComAU.pdf", pcombined, path = "../plots/", width = 6, height = 4)
 
 ###################################
