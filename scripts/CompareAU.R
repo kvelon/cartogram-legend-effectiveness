@@ -6,7 +6,7 @@ library(rstatix)
 library(cowplot)
 library(exact2x2)
 
-source("Util.R")
+source("scripts/Util.R")
 
 com_au <- c("ComAU1a", "ComAU1b_1",
             "ComAU2a", "ComAU2b_1",
@@ -21,22 +21,22 @@ treatments <- c("None", "StLO", "StLG", "SeLG")
 
 #############################
 # Read in data
-gp1 <- read_csv("../data/group1.csv") %>%
+gp1 <- read_csv("data/group1.csv") %>%
   slice(3:n()) %>%
   select(com_au) %>%
   mutate(participant_id = row_number())
 
-gp2 <- read_csv("../data/group2.csv") %>%
+gp2 <- read_csv("data/group2.csv") %>%
   slice(3:n()) %>%
   select(com_au) %>%
   mutate(participant_id = row_number() + 11)
 
-gp3 <- read_csv("../data/group3.csv") %>%
+gp3 <- read_csv("data/group3.csv") %>%
   slice(3:n()) %>%
   select(com_au) %>%
   mutate(participant_id = row_number() + 22)
 
-gp4 <- read_csv("../data/group4.csv") %>%
+gp4 <- read_csv("data/group4.csv") %>%
   slice(3:n()) %>%
   select(com_au) %>%
   mutate(participant_id = row_number() + 33)
@@ -408,6 +408,16 @@ pbar <- pbar + stat_pvalue_manual(na_pairwise_effect_adj,
                                   y.position = c(77, 82, 88, 93, 99))
 
 ###################################
+# Ryan–Holm step-down Bonferroni adjusted confidence intervals
+###################################
+
+na_pairwise_effect_ci(comau_NA_all, c("None", "StLO"), 1 - 0.05 / 8) 
+na_pairwise_effect_ci(comau_NA_all, c("None", "StLG"), 1 - 0.05 / 9)
+na_pairwise_effect_ci(comau_NA_all, c("None", "SeLG"), 1 - 0.05 / 10)
+na_pairwise_effect_ci(comau_NA_all, c("StLO", "StLG"), 1 - 0.05 / 6)
+na_pairwise_effect_ci(comau_NA_all, c("StLO", "SeLG"), 1 - 0.05 / 7)
+
+###################################
 ######      Combine plots     #####
 ###################################
 
@@ -449,3 +459,17 @@ for (i in treatments) {
   print(c("Treatment", i))
   print(summary(comau_all_time[comau_all_time$Treatment == i, "Time"]))
 }
+
+###################################
+# Ryan–Holm step-down Bonferroni adjusted confidence intervals
+###################################
+
+cat("Ryan–Holm step-down Bonferroni adjusted confidence intervals")
+none_selg <- comau_all_time |> filter(Treatment %in% c("None", "SeLG"))
+wilcox.test(Time ~ Treatment, none_selg, conf.int = TRUE, conf.level = 1 - 0.05 / 4)$conf.int
+
+stlo_stlg <- comau_all_time |> filter(Treatment %in% c("StLO", "StLG"))
+wilcox.test(Time ~ Treatment, stlo_stlg, conf.int = TRUE, conf.level = 1 - 0.05 / 5)$conf.int
+
+stlo_selg <- comau_all_time |> filter(Treatment %in% c("StLO", "SeLG"))
+wilcox.test(Time ~ Treatment, stlo_selg, conf.int = TRUE, conf.level = 1 - 0.05 / 6)$conf.int

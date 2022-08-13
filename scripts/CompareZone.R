@@ -6,7 +6,7 @@ library(rstatix)
 library(cowplot)
 library(exact2x2)
 
-source("Util.R")
+source("scripts//Util.R")
 
 com_zo <- c("ComZo1a", "ComZo1b_1",
             "ComZo2a", "ComZo2b_1",
@@ -21,22 +21,22 @@ treatments <- c("None", "StLO", "StLG", "SeLG")
 
 #############################
 # Read in data
-gp1 <- read_csv("../data/group1.csv") %>%
+gp1 <- read_csv("data/group1.csv") %>%
   slice(3:n()) %>%
   select(com_zo) %>%
   mutate(participant_id = row_number())
 
-gp2 <- read_csv("../data/group2.csv") %>%
+gp2 <- read_csv("data/group2.csv") %>%
   slice(3:n()) %>%
   select(com_zo) %>%
   mutate(participant_id = row_number() + 11)
 
-gp3 <- read_csv("../data/group3.csv") %>%
+gp3 <- read_csv("data/group3.csv") %>%
   slice(3:n()) %>%
   select(com_zo) %>%
   mutate(participant_id = row_number() + 22)
 
-gp4 <- read_csv("../data/group4.csv") %>%
+gp4 <- read_csv("data/group4.csv") %>%
   slice(3:n()) %>%
   select(com_zo) %>%
   mutate(participant_id = row_number() + 33)
@@ -354,6 +354,15 @@ na_pairwise_effect_adj <-
   mutate(p_adj = p.adjust(p, method = "holm"),
          stars = get_stars(p_adj))
 
+###################################
+# Ryan–Holm step-down Bonferroni adjusted confidence intervals
+###################################
+
+na_pairwise_effect_ci(comzo_NA_all, c("None", "StLG"), 1 - 0.05/10)
+na_pairwise_effect_ci(comzo_NA_all, c("None", "SeLG"), 1 - 0.05/9)
+na_pairwise_effect_ci(comzo_NA_all, c("StLO", "StLG"), 1 - 0.05/7)
+na_pairwise_effect_ci(comzo_NA_all, c("StLO", "SeLG"), 1 - 0.05/7)
+
 # Plot significant p-values
 pbar <- pbar + stat_pvalue_manual(na_pairwise_effect_adj,
                                   label = "stars",
@@ -403,3 +412,20 @@ for (i in treatments) {
   print(c("Treatment", i))
   print(summary(comzo_all_time[comzo_all_time$Treatment == i, "Time"]))
 }
+
+###################################
+# Ryan–Holm step-down Bonferroni adjusted confidence intervals
+###################################
+
+cat("Ryan–Holm step-down Bonferroni adjusted confidence intervals")
+none_stlg <- comzo_all_time |> filter(Treatment %in% c("None", "StLG"))
+wilcox.test(Time ~ Treatment, none_stlg, conf.int = TRUE, conf.level = 1 - 0.05 / 6)$conf.int
+
+none_selg <- comzo_all_time |> filter(Treatment %in% c("None", "SeLG"))
+wilcox.test(Time ~ Treatment, none_selg, conf.int = TRUE, conf.level = 1 - 0.05 / 5)$conf.int
+
+stlo_stlg <- comzo_all_time |> filter(Treatment %in% c("StLO", "StLG"))
+wilcox.test(Time ~ Treatment, stlo_stlg, conf.int = TRUE, conf.level = 1 - 0.05 / 4)$conf.int
+
+stlo_selg <- comzo_all_time |> filter(Treatment %in% c("StLO", "SeLG"))
+wilcox.test(Time ~ Treatment, stlo_selg, conf.int = TRUE, conf.level = 1 - 0.05 / 3)$conf.int

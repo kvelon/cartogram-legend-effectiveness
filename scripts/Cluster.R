@@ -4,7 +4,7 @@ library(tidyverse)
 library(ggpubr)
 library(rstatix)
 library(cowplot)
-source("Util.R")
+source("scripts/Util.R")
 
 cluster <- c("CluAU1", "CluAU2",
              "CluAU3", "CluAU4",
@@ -17,22 +17,22 @@ treatments <- c("None", "StLO", "StLG", "SeLG")
 #############################
 # Read in data
 #############################
-gp1 <- read_csv("../data/group1.csv") %>%
+gp1 <- read_csv("data/group1.csv") %>%
   slice(3:n()) %>%
   select(cluster) %>%
   mutate(participant_id = row_number())
 
-gp2 <- read_csv("../data/group2.csv") %>%
+gp2 <- read_csv("data/group2.csv") %>%
   slice(3:n()) %>%
   select(cluster) %>%
   mutate(participant_id = row_number() + 11)
 
-gp3 <- read_csv("../data/group3.csv") %>%
+gp3 <- read_csv("data/group3.csv") %>%
   slice(3:n()) %>%
   select(cluster) %>%
   mutate(participant_id = row_number() + 22)
 
-gp4 <- read_csv("../data/group4.csv") %>%
+gp4 <- read_csv("data/group4.csv") %>%
   slice(3:n()) %>%
   select(cluster) %>%
   mutate(participant_id = row_number() + 33)
@@ -250,3 +250,14 @@ for (i in unique(cluall_time$Treatment)) {
   print(c("Treatment", i))
   print(summary(cluall_time[cluall_time$Treatment == i, "Time"]))
 }
+
+###################################
+# Ryan–Holm step-down Bonferroni adjusted confidence intervals
+###################################
+
+cat("Ryan–Holm step-down Bonferroni adjusted confidence intervals")
+none_stlg <- cluall_time |> filter(Treatment %in% c("None", "StLG"))
+wilcox.test(Time ~ Treatment, none_stlg, conf.int = TRUE, conf.level = 1 - 0.05 / 5)$conf.int
+
+none_selg <- cluall_time |> filter(Treatment %in% c("None", "SeLG"))
+wilcox.test(Time ~ Treatment, none_selg, conf.int = TRUE, conf.level = 1 - 0.05 / 6)$conf.int

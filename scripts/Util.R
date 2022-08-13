@@ -492,7 +492,7 @@ chi2_and_main_p <- function(test) {
 }
 
 # Function to get pairwise CIs for NA analysis
-na_pairwise_effect_ci <- function(NA_all, two_treatments) {
+na_pairwise_effect_ci <- function(NA_all, two_treatments, conf_level = 0.95) {
   
   sbset <- NA_all[NA_all$treatment %in% two_treatments, ]
   sbset$answer <- as.logical(sbset$answer)
@@ -506,7 +506,7 @@ na_pairwise_effect_ci <- function(NA_all, two_treatments) {
   tble[2, 1] <- sum(sbset[,two_treatments[1]] & !sbset[,two_treatments[2]])
   tble[2, 2] <- sum(sbset[,two_treatments[1]] & sbset[,two_treatments[2]])
   
-  mcnemar.exact(tble)
+  mcnemar.exact(tble, conf.level = conf_level)
   
 }
 
