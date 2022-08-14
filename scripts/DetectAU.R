@@ -6,7 +6,7 @@ library(rstatix)
 library(cowplot)
 library(exact2x2)
 
-source("Util.R")
+source("scripts/Util.R")
 
 dc_au <- c("DCAU1a", "DCAU1b",
            "DCAU2a", "DCAU2b",
@@ -21,22 +21,22 @@ treatments <- c("None", "StLO", "StLG", "SeLG")
 
 #############################
 # Read in data
-gp1 <- read_csv("../data/group1.csv") %>%
+gp1 <- read_csv("data/group1.csv") %>%
   slice(3:n()) %>%
   select(dc_au) %>%
   mutate(participant_id = row_number())
 
-gp2 <- read_csv("../data/group2.csv") %>%
+gp2 <- read_csv("data/group2.csv") %>%
   slice(3:n()) %>%
   select(dc_au) %>%
   mutate(participant_id = row_number() + 11)
 
-gp3 <- read_csv("../data/group3.csv") %>%
+gp3 <- read_csv("data/group3.csv") %>%
   slice(3:n()) %>%
   select(dc_au) %>%
   mutate(participant_id = row_number() + 22)
 
-gp4 <- read_csv("../data/group4.csv") %>%
+gp4 <- read_csv("data/group4.csv") %>%
   slice(3:n()) %>%
   select(dc_au) %>%
   mutate(participant_id = row_number() + 33)
@@ -341,6 +341,14 @@ na_pairwise_effect_adj <-
           "StLG", "SeLG", p_stlg_selg) |>
   mutate(p_adj = p.adjust(p, method = "holm"),
          stars = get_stars(p_adj))
+
+###################################
+# Ryan–Holm step-down Bonferroni adjusted confidence intervals
+###################################
+na_pairwise_effect_ci(dcau_NA_all, c("None", "StLO"), 1 - 0.05/8)
+na_pairwise_effect_ci(dcau_NA_all, c("None", "StLG"), 1 - 0.05/9)
+na_pairwise_effect_ci(dcau_NA_all, c("None", "SeLG"), 1 - 0.05/10)
+na_pairwise_effect_ci(dcau_NA_all, c("StLO", "SeLG"), 1 - 0.05/7)
 
 # Plot significant p-values
 pbar <- pbar + stat_pvalue_manual(na_pairwise_effect_adj,

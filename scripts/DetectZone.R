@@ -6,7 +6,7 @@ library(rstatix)
 library(cowplot)
 library(exact2x2)
 
-source("Util.R")
+source("scripts/Util.R")
 
 dc_zo <- c("DCZo1a", "DCZo1b",
            "DCZo2a", "DCZo2b",
@@ -21,22 +21,22 @@ treatments <- c("None", "StLO", "StLG", "SeLG")
 
 #############################
 # Read in data
-gp1 <- read_csv("../data/group1.csv") %>%
+gp1 <- read_csv("data/group1.csv") %>%
   slice(3:n()) %>%
   select(dc_zo) %>%
   mutate(participant_id = row_number())
 
-gp2 <- read_csv("../data/group2.csv") %>%
+gp2 <- read_csv("data/group2.csv") %>%
   slice(3:n()) %>%
   select(dc_zo) %>%
   mutate(participant_id = row_number() + 11)
 
-gp3 <- read_csv("../data/group3.csv") %>%
+gp3 <- read_csv("data/group3.csv") %>%
   slice(3:n()) %>%
   select(dc_zo) %>%
   mutate(participant_id = row_number() + 22)
 
-gp4 <- read_csv("../data/group4.csv") %>%
+gp4 <- read_csv("data/group4.csv") %>%
   slice(3:n()) %>%
   select(dc_zo) %>%
   mutate(participant_id = row_number() + 33)
@@ -343,6 +343,11 @@ p_stlo_stlg <- na_pairwise_effect_ci(dczo_NA_all, c("StLO", "StLG"))$p.value
 p_stlo_selg <- na_pairwise_effect_ci(dczo_NA_all, c("StLO", "SeLG"))$p.value
 p_stlg_selg <- na_pairwise_effect_ci(dczo_NA_all, c("StLG", "SeLG"))$p.value
 
+###################################
+# Ryan–Holm step-down Bonferroni adjusted confidence intervals
+###################################
+na_pairwise_effect_ci(dczo_NA_all, c("None", "SeLG"), 1 - 0.05/10)
+
 na_pairwise_effect_adj <-
   tribble(~group1, ~group2, ~p,
           "None", "StLO", p_none_stlo,
@@ -378,7 +383,7 @@ pcombined <- plot_grid(title,
                        nrow = 2,
                        rel_heights = c(0.12, 1))
 
-saveRDS(pcombined, file = "../rdata/Combined_DCZo.rds")
+#saveRDS(pcombined, file = "../rdata/Combined_DCZo.rds")
 #ggsave("Combined_DCZo.pdf", pcombined, path = "../plots/", width = 6, height = 4)
 
 ###################################
@@ -403,3 +408,14 @@ for (i in treatments) {
   print(c("Treatment", i))
   print(summary(dczo_all_time[dczo_all_time$Treatment == i, "Time"]))
 }
+
+###################################
+# Ryan–Holm step-down Bonferroni adjusted confidence intervals
+###################################
+
+cat("Ryan–Holm step-down Bonferroni adjusted confidence intervals")
+none_stlg <- dczo_all_time |> filter(Treatment %in% c("None", "StLG"))
+wilcox.test(Time ~ Treatment, none_stlg, conf.int = TRUE, conf.level = 1 - 0.05 / 5)$conf.int
+
+none_selg <- dczo_all_time |> filter(Treatment %in% c("None", "SeLG"))
+wilcox.test(Time ~ Treatment, none_selg, conf.int = TRUE, conf.level = 1 - 0.05 / 6)$conf.int

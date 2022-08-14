@@ -6,7 +6,7 @@ library(rstatix)
 library(onewaytests)
 library(exact2x2)
 
-source("Util.R")
+source("scripts/Util.R")
 
 est_au <- c("EstAU1", "EstAU2", "EstAU3", "EstAU4",
             "EstAU1Ti_Page Submit", "EstAu2Ti_Page Submit",
@@ -15,22 +15,22 @@ est_au <- c("EstAU1", "EstAU2", "EstAU3", "EstAU4",
 treatments <- c("None", "StLO", "StLG", "SeLG")
 
 # Read in data
-gp1 <- read_csv("../data/group1.csv") %>%
+gp1 <- read_csv("data/group1.csv") %>%
   slice(3:n()) %>%
   select(est_au) %>%
   mutate(participant_id = row_number())
 
-gp2 <- read_csv("../data/group2.csv") %>%
+gp2 <- read_csv("data/group2.csv") %>%
   slice(3:n()) %>%
   select(est_au) %>%
   mutate(participant_id = row_number() + 11)
 
-gp3 <- read_csv("../data/group3.csv") %>%
+gp3 <- read_csv("data/group3.csv") %>%
   slice(3:n()) %>%
   select(est_au) %>%
   mutate(participant_id = row_number() + 22)
 
-gp4 <- read_csv("../data/group4.csv") %>%
+gp4 <- read_csv("data/group4.csv") %>%
   slice(3:n()) %>%
   select(est_au) %>%
   mutate(participant_id = row_number() + 33)
@@ -256,6 +256,15 @@ p_none_selg <- na_pairwise_effect_ci(estau_NA_all, c("None", "SeLG"))$p.value
 p_stlo_stlg <- na_pairwise_effect_ci(estau_NA_all, c("StLO", "StLG"))$p.value
 p_stlo_selg <- na_pairwise_effect_ci(estau_NA_all, c("StLO", "SeLG"))$p.value
 p_stlg_selg <- na_pairwise_effect_ci(estau_NA_all, c("StLG", "SeLG"))$p.value
+
+###################################
+# Ryan–Holm step-down Bonferroni adjusted confidence intervals
+###################################
+
+na_pairwise_effect_ci(estau_NA_all, c("None", "StLG"), 1 - 0.05/10)
+na_pairwise_effect_ci(estau_NA_all, c("None", "SeLG"), 1 - 0.05/10)
+na_pairwise_effect_ci(estau_NA_all, c("StLO", "StLG"), 1 - 0.05/8)
+na_pairwise_effect_ci(estau_NA_all, c("StLO", "SeLG"), 1 - 0.05/8)
 
 na_pairwise_effect_adj <-
   tribble(~group1, ~group2, ~p,
