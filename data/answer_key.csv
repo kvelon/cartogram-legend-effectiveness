@@ -1,0 +1,29 @@
+﻿task_type,task_number,correct_answer_string,correct_answer_number
+CluAU,1,Province No. 2 (TW),
+CluAU,2,Alabama (AL),
+CluAU,3,Heves (HE),
+CluAU,4,Chaco (CC),
+ComAU,1,smaller,240000
+ComAU,2,smaller,400000
+ComAU,3,larger,900000
+ComAU,4,higher,450
+ComZo,1,higher,25500
+ComZo,2,lower,25000
+ComZo,3,smaller,4000000
+ComZo,4,larger,250000
+DCAU,1,smaller,40000000
+DCAU,2,smaller,190000
+DCAU,3,smaller,200000
+DCAU,4,smaller,11000
+DCZo,1,smaller,300000
+DCZo,2,smaller,2000000
+DCZo,3,smaller,45500
+DCZo,4,smaller,10000000
+EstAU,1,,1800000
+EstAU,2,,2600000
+EstAU,3,,200000
+EstAU,4,,3400000
+FTAU,1,Makkah (MK),
+FTAU,2,Almaty (AA),
+FTAU,3,Zuid-Holland (ZH),
+FTAU,4,Kano (KN),
