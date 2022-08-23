@@ -1,29 +1,29 @@
-﻿country,task_type,task_number,group_1,group_2,group_3,group_4
-Nepal,CluAU,1,StLO,SeLG,StLG,None
-Saudi Arabia,FTAU,1,SeLG,StLG,None,StLO
-India,DCAU,1,StLG,StLO,SeLG,None
-New Zealand,DCZo,1,StLO,None,SeLG,StLG
-Denmark,EstAU,1,None,StLG,StLO,SeLG
-Czech Republic,ComZo,1,StLO ,SeLG,None,StLG
-Sri Lanka,ComAU,1,SeLG,None,StLO,StLG
-Germany,ComZo,2,SeLG,StLO,StLG,None
-Laos,DCZo,2,StLG,SeLG,None,StLO
-Ukraine,EstAU,2,StLG,None,SeLG,StLO
-Poland,ComAU,2,StLG,SeLG,None,StLO
-Kazakhstan,FTAU,2,StLO,None,SeLG,StLG
-USA,CluAU,2,StLG,StLO,None,SeLG
-Qatar,DCAU,2,SeLG,StLG,None,StLO
-Jamaica,DCZo,3,None,StLG,StLO,SeLG
-Netherlands,FTAU,3,StLG,SeLG,StLO,None
-Belgium,ComZo,3,StLG,None,StLO,SeLG
-Hungary,CluAU,3,None,StLG,SeLG,StLO
-France,ComAU,3,StLO,StLG,SeLG,None
-Ireland,EstAU,3,SeLG,StLO,None,StLG
-Cambodia,DCAU,3,None,SeLG,StLO,StLG
-Argentina,CluAU,4,SeLG,None,StLO,StLG
-South Korea,EstAU,4,StLO,SeLG,StLG,None
-Brazil,ComAU,4,None,StLO,StLG,SeLG
-Luxembourg,ComZo,4,None,StLG,SeLG,StLO
-Andorra,DCAU,4,StLO,None,StLG,SeLG
-Nigeria,FTAU,4,None,StLO,StLG,SeLG
-Myanmar ,DCZo,4,SeLG,StLO,StLG,None
+﻿country,n_admin_div,task_type,task_number,group_1,group_2,group_3,group_4
+Nepal,7,CluAU,1,StLO,SeLG,StLG,None
+Saudi Arabia,13,FTAU,1,SeLG,StLG,None,StLO
+India,35,DCAU,1,StLG,StLO,SeLG,None
+New Zealand,16,DCZo,1,StLO,None,SeLG,StLG
+Denmark,5,EstAU,1,None,StLG,StLO,SeLG
+Czech Republic,14,ComZo,1,StLO ,SeLG,None,StLG
+Sri Lanka,25,ComAU,1,SeLG,None,StLO,StLG
+Germany,16,ComZo,2,SeLG,StLO,StLG,None
+Laos,18,DCZo,2,StLG,SeLG,None,StLO
+Ukraine,27,EstAU,2,StLG,None,SeLG,StLO
+Poland,16,ComAU,2,StLG,SeLG,None,StLO
+Kazakhstan,14,FTAU,2,StLO,None,SeLG,StLG
+USA,49,CluAU,2,StLG,StLO,None,SeLG
+Qatar,8,DCAU,2,SeLG,StLG,None,StLO
+Jamaica,14,DCZo,3,None,StLG,StLO,SeLG
+Netherlands,12,FTAU,3,StLG,SeLG,StLO,None
+Belgium,3,ComZo,3,StLG,None,StLO,SeLG
+Hungary,20,CluAU,3,None,StLG,SeLG,StLO
+France,13,ComAU,3,StLO,StLG,SeLG,None
+Ireland,26,EstAU,3,SeLG,StLO,None,StLG
+Cambodia,25,DCAU,3,None,SeLG,StLO,StLG
+Argentina,24,CluAU,4,SeLG,None,StLO,StLG
+South Korea,17,EstAU,4,StLO,SeLG,StLG,None
+Brazil,27,ComAU,4,None,StLO,StLG,SeLG
+Luxembourg,12,ComZo,4,None,StLG,SeLG,StLO
+Andorra,7,DCAU,4,StLO,None,StLG,SeLG
+Nigeria,37,FTAU,4,None,StLO,StLG,SeLG
+Myanmar ,15,DCZo,4,SeLG,StLO,StLG,None

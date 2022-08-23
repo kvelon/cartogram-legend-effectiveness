@@ -117,7 +117,7 @@ experiment_sequence <-
     starts_with("group"),
     names_to = "group",
     names_pattern = "^group_(\\d)$",
-    names_transform = as.numeric,
+    names_transform = list(group = as.numeric),
     values_to = "treatment"
   )
 experimental_data <-
