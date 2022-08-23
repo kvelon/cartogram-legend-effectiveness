@@ -1,21 +1,26 @@
+library(GGally)
+library(nlme)
 library(tidyverse)
 source("scripts/Util.R")
 
 data_for_group <- function(group_number) {
 
-  # Import questionnaire with response times and answers
+  # Import questionnaire with response times, map familiarity and answers
   gp <-
     read_csv(str_c("data/group", group_number, ".csv")) |>
     slice(3:n()) |>
     mutate(participant_id = row_number())
 
-  # Make separate tibbles for response times, string answers and numeric
-  # answers. We start with response times.
-  times <-
+  # Make separate tibbles for:
+  # - map familiarity and response times.
+  # - string answers.
+  # - numeric answers.
+  # We start with response times and map familiarity.
+  familiarity_and_times <-
     gp |>
-    select(participant_id, ends_with("Ti_Page Submit")) |>
+    select(participant_id, starts_with("Fam"), ends_with("Ti_Page Submit")) |>
     pivot_longer(
-      -participant_id,
+      -c(participant_id, starts_with("Fam")),
       names_to = "task_part",
       values_to = "time"
     ) |>
@@ -24,6 +29,7 @@ data_for_group <- function(group_number) {
       task_part = str_replace(task_part, "^EstAu", "EstAU"),
       time = as.numeric(time)
     )
+  print(familiarity_and_times)
 
   # String answers
   string_task_parts <- list(
@@ -80,12 +86,13 @@ data_for_group <- function(group_number) {
       numeric_answer = get_double_column(numeric_answer)
     )
 
-  # Join the information about response times, numeric answers and string
-  # answers
+  # Join the information about response times, string answers, numeric
+  # answers and map familiarity
   gp <-
-    times |>
+    familiarity_and_times |>
     left_join(string_answers, by = c("participant_id", "task_part")) |>
     left_join(numeric_answers, by = c("participant_id", "task_part"))
+  print(gp)
 
   # Remove wrong or missing answers
   answer_key <- read_csv("data/answer_key.csv")
@@ -104,11 +111,13 @@ data_for_group <- function(group_number) {
     group_by(participant_id, task) |>
     summarise(
       time = sum(time),
-      keep_answer = all(keep_answer)
+      keep_answer = all(keep_answer),
+      across(starts_with("Fam"), )
     ) |>
+    ungroup(participant_id, task) |>
     filter(keep_answer) |>
     mutate(group = group_number) |>
-    select(group, participant_id, task, time)
+    select(group, participant_id, starts_with("fam"), task, time)
 }
 
 experiment_sequence <-
@@ -123,8 +132,27 @@ experiment_sequence <-
 experimental_data <-
   map_dfr(1:4, ~ bind_rows(data_for_group(.))) |>
   mutate(
+    unique_participant_id = (group - 1) * 11 + participant_id,
     task_type = str_replace(task, "^(.*)\\d$", "\\1"),
     task_number = as.numeric(str_replace(task, "^.*(\\d)$", "\\1"))
   ) |>
   select(-task) |>
   left_join(experiment_sequence, by = c("task_type", "task_number", "group"))
+data_for_regression <-
+  experimental_data |>
+  mutate(log10_time = log10(time)) |>
+  select(
+    log10_time,
+    unique_participant_id,
+    starts_with("Fam"),
+    task_type,
+    n_admin_div,
+    treatment
+  )
+model <- lme(
+  log10_time ~
+    task_type + n_admin_div + treatment,
+  data = data_for_regression,
+  random = ~ 1| unique_participant_id
+)
+summary(model)
