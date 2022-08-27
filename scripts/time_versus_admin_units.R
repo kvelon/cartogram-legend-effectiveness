@@ -1,8 +1,9 @@
-library(GGally)
-library(nlme)
+library(AICcmodavg)
+library(lme4)
 library(tidyverse)
 source("scripts/Util.R")
 
+# Function to import data for one treatment group
 data_for_group <- function(group_number) {
 
   # Import questionnaire with response times, map familiarity and answers
@@ -18,9 +19,10 @@ data_for_group <- function(group_number) {
   # We start with response times and map familiarity.
   familiarity_and_times <-
     gp |>
-    select(participant_id, starts_with("Fam"), ends_with("Ti_Page Submit")) |>
+    rename_with(~ str_replace(., "^Fam", "fam")) |>
+    select(participant_id, starts_with("fam"), ends_with("Ti_Page Submit")) |>
     pivot_longer(
-      -c(participant_id, starts_with("Fam")),
+      -c(participant_id, starts_with("fam")),
       names_to = "task_part",
       values_to = "time"
     ) |>
@@ -29,7 +31,6 @@ data_for_group <- function(group_number) {
       task_part = str_replace(task_part, "^EstAu", "EstAU"),
       time = as.numeric(time)
     )
-  print(familiarity_and_times)
 
   # String answers
   string_task_parts <- list(
@@ -92,7 +93,6 @@ data_for_group <- function(group_number) {
     familiarity_and_times |>
     left_join(string_answers, by = c("participant_id", "task_part")) |>
     left_join(numeric_answers, by = c("participant_id", "task_part"))
-  print(gp)
 
   # Remove wrong or missing answers
   answer_key <- read_csv("data/answer_key.csv")
@@ -132,7 +132,7 @@ experiment_sequence <-
 experimental_data <-
   map_dfr(1:4, ~ bind_rows(data_for_group(.))) |>
   mutate(
-    unique_participant_id = (group - 1) * 11 + participant_id,
+    unique_participant_id = as.factor((group - 1) * 11 + participant_id),
     task_type = str_replace(task, "^(.*)\\d$", "\\1"),
     task_number = as.numeric(str_replace(task, "^.*(\\d)$", "\\1"))
   ) |>
@@ -149,10 +149,47 @@ data_for_regression <-
     n_admin_div,
     treatment
   )
-model <- lme(
-  log10_time ~
-    task_type + n_admin_div + treatment,
-  data = data_for_regression,
-  random = ~ 1| unique_participant_id
+
+# Linear model without random effects
+model_lm <- lm(
+  log10_time ~ task_type + n_admin_div + treatment,
+  data = data_for_regression
 )
-summary(model)
+
+# Function to run a linear mixed-effect model
+model_with_random_effect <- function(random_effect) {
+  re <- map_chr(random_effect, ~ str_c("(1 | ", ., ")")) |>
+    str_c(collapse = " + ")
+  print(re)
+  lmer(
+    as.formula(str_c(
+      "log10_time ~ task_type + n_admin_div + treatment + ",
+      re
+    )),
+    data = data_for_regression,
+    REML = FALSE
+  )
+}
+random_effects <- list(
+  "fam1",
+  "fam2",
+  "fam3",
+  c("fam1", "fam2"),
+  c("fam1", "fam3"),
+  c("fam2", "fam3"),
+  c("fam1", "fam2", "fam3"),
+  "unique_participant_id"
+)
+lmer_list <-
+  map(random_effects, model_with_random_effect) |>
+  set_names(map_chr(random_effects, ~ str_c(., collapse = "_")))
+aic_tab_lmer <- aictab(lmer_list)
+aic_tab <-
+  aictab(list(model_lm), modnames = "None") |>
+  mutate(
+    Delta_AICc = AICc - aic_tab_lmer$AICc[1],
+    AICcWt = 0,
+    Cum.Wt = 1) |>
+  rbind(aic_tab_lmer) |>
+  arrange(AICc) |>
+  print()
