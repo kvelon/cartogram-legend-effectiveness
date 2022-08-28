@@ -1,5 +1,6 @@
 library(AICcmodavg)
 library(lme4)
+library(nlme)
 library(tidyverse)
 source("scripts/Util.R")
 
@@ -160,7 +161,6 @@ model_lm <- lm(
 model_with_random_effect <- function(random_effect) {
   re <- map_chr(random_effect, ~ str_c("(1 | ", ., ")")) |>
     str_c(collapse = " + ")
-  print(re)
   lmer(
     as.formula(str_c(
       "log10_time ~ task_type + n_admin_div + treatment + ",
@@ -189,7 +189,42 @@ aic_tab <-
   mutate(
     Delta_AICc = AICc - aic_tab_lmer$AICc[1],
     AICcWt = 0,
-    Cum.Wt = 1) |>
+    Cum.Wt = 1
+  ) |>
   rbind(aic_tab_lmer) |>
-  arrange(AICc) |>
-  print()
+  arrange(AICc)
+print(aic_tab)
+
+# Get p-values for unique_participant_id
+model_lme <- lme(
+  log10_time ~ task_type + n_admin_div + treatment,
+  data = data_for_regression,
+  random = ~ 1 | unique_participant_id,
+  method = "REML"
+)
+t <- summary(model_lme)$tTable[, "t-value"]["n_admin_div"]
+degrees_of_freedom <- summary(model_lme)$tTable[, "DF"]["n_admin_div"]
+pt(t, degrees_of_freedom, lower.tail = FALSE) # p-value for one-sided test
+
+# Distribution of participants' map familiarity
+participants_map_familiarity <-
+  data_for_regression |>
+  group_by(unique_participant_id, fam1, fam3) |>
+  summarise(n_participants = n()) |>
+  ungroup(unique_participant_id) |>
+  count(fam1, fam3, name = "n_participants")
+distr_of_correct_answers <-
+  data_for_regression |>
+  group_by(fam1, fam3) |>
+  summarise(n_correct_answer = n())
+map_familiarity <-
+  left_join(
+    distr_of_correct_answers,
+    participants_map_familiarity,
+    by = c("fam1", "fam3")
+  ) |>
+  mutate(ratio = n_correct_answer / n_participants)
+chisq.test(
+  map_familiarity$n_correct_answer,
+  p = map_familiarity$n_participants / sum(map_familiarity$n_participants)
+)
