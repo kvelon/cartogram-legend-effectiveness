@@ -95,7 +95,7 @@ data_for_group <- function(group_number) {
     left_join(string_answers, by = c("participant_id", "task_part")) |>
     left_join(numeric_answers, by = c("participant_id", "task_part"))
 
-  # Remove wrong or missing answers
+  # Remove wrong and missing answers
   answer_key <- read_csv("data/answer_key.csv")
   gp |>
     left_join(answer_key, by = "task_part") |>
@@ -151,26 +151,18 @@ data_for_regression <-
     treatment
   )
 
-# Linear model without random effects
-model_lm <- lm(
-  log10_time ~ task_type + n_admin_div + treatment,
-  data = data_for_regression
-)
-
-# Function to run a linear mixed-effect model
-model_with_random_effect <- function(random_effect) {
-  re <- map_chr(random_effect, ~ str_c("(1 | ", ., ")")) |>
-    str_c(collapse = " + ")
-  lmer(
-    as.formula(str_c(
-      "log10_time ~ task_type + n_admin_div + treatment + ",
-      re
-    )),
-    data = data_for_regression,
-    REML = FALSE
+# Function to run a linear model without random effects
+model_with_fixed_effects_only <- function(fixed_effect) {
+  fe <-
+    map_chr(fixed_effect, ~ str_c(" + ", .)) |>
+    str_c(collapse = "")
+  lm(
+    as.formula(str_c("log10_time ~ task_type + n_admin_div + treatment", fe)),
+    data = data_for_regression
   )
 }
-random_effects <- list(
+fixed_effects <- list(
+  NULL,
   "fam1",
   "fam2",
   "fam3",
@@ -180,20 +172,48 @@ random_effects <- list(
   c("fam1", "fam2", "fam3"),
   "unique_participant_id"
 )
+lm_list <-
+  map(fixed_effects, model_with_fixed_effects_only) |>
+  set_names(str_c(
+    "lm_",
+    map_chr(fixed_effects, ~ str_c(., collapse = "_"))
+  ))
+bictab_lm <- bictab(lm_list)
+
+# Function to run a linear mixed-effect model with participant as random
+# effect
+model_with_random_effect <- function(fixed_effect) {
+  fe <-
+    map_chr(fixed_effect, ~ str_c(" + ", .)) |>
+    str_c(collapse = "")
+  lmer(
+    as.formula(str_c(
+      "log10_time ~ task_type + n_admin_div + treatment",
+      fe,
+      " + (1 | unique_participant_id)"
+    )),
+    data = data_for_regression,
+    REML = FALSE
+  )
+}
+fixed_effects_with_random <- fixed_effects[-length(fixed_effects)]
 lmer_list <-
-  map(random_effects, model_with_random_effect) |>
-  set_names(map_chr(random_effects, ~ str_c(., collapse = "_")))
-aic_tab_lmer <- aictab(lmer_list)
-aic_tab <-
-  aictab(list(model_lm), modnames = "None") |>
-  mutate(
-    Delta_AICc = AICc - aic_tab_lmer$AICc[1],
-    AICcWt = 0,
-    Cum.Wt = 1
-  ) |>
-  rbind(aic_tab_lmer) |>
-  arrange(AICc)
-print(aic_tab)
+  map(fixed_effects_with_random, model_with_random_effect) |>
+  set_names(str_c(
+    "lmer_",
+    map_chr(fixed_effects_with_random, ~ str_c(., collapse = "_"))
+  ))
+bictab_lmer <- bictab(lmer_list)
+
+# Combined BIC table
+bictab_combined <-
+  bictab_lm |>
+  bind_rows(bictab_lmer) |>
+  as_tibble() |>
+  select(modnames = Modnames, k = K, bic = BIC) |>
+  arrange(bic) |>
+  mutate(delta_bic = bic - first(bic))
+bictab_combined
 
 # Get p-values for unique_participant_id
 model_lme <- lme(
@@ -205,26 +225,3 @@ model_lme <- lme(
 t <- summary(model_lme)$tTable[, "t-value"]["n_admin_div"]
 degrees_of_freedom <- summary(model_lme)$tTable[, "DF"]["n_admin_div"]
 pt(t, degrees_of_freedom, lower.tail = FALSE) # p-value for one-sided test
-
-# Distribution of participants' map familiarity
-participants_map_familiarity <-
-  data_for_regression |>
-  group_by(unique_participant_id, fam1, fam3) |>
-  summarise(n_participants = n()) |>
-  ungroup(unique_participant_id) |>
-  count(fam1, fam3, name = "n_participants")
-distr_of_correct_answers <-
-  data_for_regression |>
-  group_by(fam1, fam3) |>
-  summarise(n_correct_answer = n())
-map_familiarity <-
-  left_join(
-    distr_of_correct_answers,
-    participants_map_familiarity,
-    by = c("fam1", "fam3")
-  ) |>
-  mutate(ratio = n_correct_answer / n_participants)
-chisq.test(
-  map_familiarity$n_correct_answer,
-  p = map_familiarity$n_participants / sum(map_familiarity$n_participants)
-)
