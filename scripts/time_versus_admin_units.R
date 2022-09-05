@@ -66,14 +66,6 @@ data_for_group <- function(group_number) {
     str_starts(numeric_task_parts, "Com") ~ str_c(numeric_task_parts, "b_1"),
     TRUE ~ numeric_task_parts
   )
-  million_string_to_number <- function(s) {
-    case_when(
-      is.na(s) ~ NA_real_,
-      str_ends(s, "[mM]ill*ion") ~
-        as.character(as.numeric(str_replace(s, "\\s?[mM]ill*ion", "")) * 1e6),
-      TRUE ~ s
-    )
-  }
   numeric_answers <-
     gp |>
     select(participant_id, numeric_task_parts) |>
@@ -87,7 +79,7 @@ data_for_group <- function(group_number) {
       numeric_answer = str_remove(numeric_answer, " brl"),
       numeric_answer = get_double_column(numeric_answer)
     )
-
+  
   # Join the information about response times, string answers, numeric
   # answers and map familiarity
   gp <-
