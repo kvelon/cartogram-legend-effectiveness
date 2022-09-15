@@ -2,7 +2,7 @@ library(broom)
 library(rcompanion)
 library(tidyverse)
 
-source("Util.R")
+source("scripts/Util.R")
 
 est_au_columns <- str_c("EstAU", 1:4)
 assignments <-
@@ -20,7 +20,7 @@ assignments <-
     )
   )
 import_group <- function(group, ignore_rows_before) {
-  str_c("../data/group", group, ".csv") |>
+  str_c("data/group", group, ".csv") |>
     read_csv(col_types = cols()) |>
     when(
       ignore_rows_before > 0 ~ slice(., -seq_len(ignore_rows_before)),
