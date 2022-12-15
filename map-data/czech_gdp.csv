@@ -1,15 +1,15 @@
-Region,GDP,Colour
-South Moravian,12117,#e7298a
-South Bohemian,6399,#66a61e
-Karlovy Vary,2789,#e7298a
-Vysocina,5142,#7570b3
-Hradec Kralove,5670,#d95f02
-Liberec,4004,#66a61e
-Moravian-Silesian,11878,#e7298a
-Olomouc,5696,#e6ab02
-Pardubice,4944,#66a61e
-Plzen,5846,#d95f02
-Prague,27031,#e6ab02
-Central Bohemian,12246,#e7298a
-Zlin,5586,#66a61e
-Usti nad Labem,7971,#7570b3
+Region,GDP,Colour,colour_shown_in_experiment
+South Moravian,12117,#e7298a,yellow
+South Bohemian,6399,#66a61e,purple
+Karlovy Vary,2789,#e7298a,purple
+Vysocina,5142,#7570b3,purple
+Hradec Kralove,5670,#d95f02,yellow
+Liberec,4004,#66a61e,purple
+Moravian-Silesian,11878,#e7298a,yellow
+Olomouc,5696,#e6ab02,yellow
+Pardubice,4944,#66a61e,yellow
+Plzen,5846,#d95f02,purple
+Prague,27031,#e6ab02,purple
+Central Bohemian,12246,#e7298a,purple
+Zlin,5586,#66a61e,yellow
+Usti nad Labem,7971,#7570b3,purple
