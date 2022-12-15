@@ -1,29 +1,29 @@
-﻿country,n_admin_div,task_type,task_number,group_1,group_2,group_3,group_4
-Nepal,7,CluAU,1,StLO,SeLG,StLG,None
-Saudi Arabia,13,FTAU,1,SeLG,StLG,None,StLO
-India,35,DCAU,1,StLG,StLO,SeLG,None
-New Zealand,16,DCZo,1,StLO,None,SeLG,StLG
-Denmark,5,EstAU,1,None,StLG,StLO,SeLG
-Czech Republic,14,ComZo,1,StLO ,SeLG,None,StLG
-Sri Lanka,25,ComAU,1,SeLG,None,StLO,StLG
-Germany,16,ComZo,2,SeLG,StLO,StLG,None
-Laos,18,DCZo,2,StLG,SeLG,None,StLO
-Ukraine,27,EstAU,2,StLG,None,SeLG,StLO
-Poland,16,ComAU,2,StLG,SeLG,None,StLO
-Kazakhstan,14,FTAU,2,StLO,None,SeLG,StLG
-USA,49,CluAU,2,StLG,StLO,None,SeLG
-Qatar,8,DCAU,2,SeLG,StLG,None,StLO
-Jamaica,14,DCZo,3,None,StLG,StLO,SeLG
-Netherlands,12,FTAU,3,StLG,SeLG,StLO,None
-Belgium,3,ComZo,3,StLG,None,StLO,SeLG
-Hungary,20,CluAU,3,None,StLG,SeLG,StLO
-France,13,ComAU,3,StLO,StLG,SeLG,None
-Ireland,26,EstAU,3,SeLG,StLO,None,StLG
-Cambodia,25,DCAU,3,None,SeLG,StLO,StLG
-Argentina,24,CluAU,4,SeLG,None,StLO,StLG
-South Korea,17,EstAU,4,StLO,SeLG,StLG,None
-Brazil,27,ComAU,4,None,StLO,StLG,SeLG
-Luxembourg,12,ComZo,4,None,StLG,SeLG,StLO
-Andorra,7,DCAU,4,StLO,None,StLG,SeLG
-Nigeria,37,FTAU,4,None,StLO,StLG,SeLG
-Myanmar ,15,DCZo,4,SeLG,StLO,StLG,None
+﻿country,n_admin_div,task_type,task_number,group_1,group_2,group_3,group_4,total_area_1,total_area_2,focal_area_1,focal_area_2
+Nepal,7,CluAU,1,StLO,SeLG,StLG,None,1039538,,,
+Saudi Arabia,13,FTAU,1,SeLG,StLG,None,StLO,33413660,,,
+India,35,DCAU,1,StLG,StLO,SeLG,None,439226374,1.22E+09,20633305,60383628
+New Zealand,16,DCZo,1,StLO,None,SeLG,StLG,3373191,4.79E+06,8.53E+05,1149564
+Denmark,5,EstAU,1,None,StLG,StLO,SeLG,5781190,,,
+Czech Republic,14,ComZo,1,StLO ,SeLG,None,StLG,117319,,71428,45891
+Sri Lanka,25,ComAU,1,SeLG,None,StLO,StLG,20359439,,599903,840648
+Germany,16,ComZo,2,SeLG,StLO,StLG,None,3.63E+06,,183705,208344
+Laos,18,DCZo,2,StLG,SeLG,None,StLO,3628915,7.12E+06,2.16E+06,4180400
+Ukraine,27,EstAU,2,StLG,None,SeLG,StLO,44140788,,,
+Poland,16,ComAU,2,StLG,SeLG,None,StLO,38412938,,1703000,2121600
+Kazakhstan,14,FTAU,2,StLO,None,SeLG,StLG,18240289,,,
+USA,49,CluAU,2,StLG,StLO,None,SeLG,306685947,,,
+Qatar,8,DCAU,2,SeLG,StLG,None,StLO,369078,2.40E+06,9968,202031
+Jamaica,14,DCZo,3,None,StLG,StLO,SeLG,2607631,2.73E+06,1.02E+06,1068993
+Netherlands,12,FTAU,3,StLG,SeLG,StLO,None,17282109,,,
+Belgium,3,ComZo,3,StLG,None,StLO,SeLG,11322088,,3614473,7707615
+Hungary,20,CluAU,3,None,StLG,SeLG,StLO,9942273,,,
+France,13,ComAU,3,StLO,StLG,SeLG,None,64812052,,5978266,5059473
+Ireland,26,EstAU,3,SeLG,StLO,None,StLG,4761865,,,
+Cambodia,25,DCAU,3,None,SeLG,StLO,StLG,11634095,1.53E+07,793129,987400
+Argentina,24,CluAU,4,SeLG,None,StLO,StLG,40091349,,,
+South Korea,17,EstAU,4,StLO,SeLG,StLG,None,50620000,,,
+Brazil,27,ComAU,4,None,StLO,StLG,SeLG,5995.784,,659.137,215.613
+Luxembourg,12,ComZo,4,None,StLG,SeLG,StLO,626108,,447373,178735
+Andorra,7,DCAU,4,StLO,None,StLG,SeLG,11356,8.03E+04,1096,12041.25
+Nigeria,37,FTAU,4,None,StLO,StLG,SeLG,139707540,,,
+Myanmar ,15,DCZo,4,SeLG,StLO,StLG,None,35300203,5.41E+07,1.87E+07,29290013

@@ -75,22 +75,22 @@ time_cols = c("EstAU1Ti_Page Submit", "EstAu2Ti_Page Submit",
               )
 
 
-gp1 <- read_csv("../data/group1.csv") %>%
+gp1 <- read_csv("data/group1.csv") %>%
   slice(3:n()) %>%
   select(time_cols) %>%
   mutate(participant_id = row_number())
 
-gp2 <- read_csv("../data/group2.csv") %>%
+gp2 <- read_csv("data/group2.csv") %>%
   slice(3:n()) %>%
   select(time_cols) %>%
   mutate(participant_id = row_number() + 11)
 
-gp3 <- read_csv("../data/group3.csv") %>%
+gp3 <- read_csv("data/group3.csv") %>%
   slice(3:n()) %>%
   select(time_cols) %>%
   mutate(participant_id = row_number() + 22)
 
-gp4 <- read_csv("../data/group4.csv") %>%
+gp4 <- read_csv("data/group4.csv") %>%
   slice(3:n()) %>%
   select(time_cols) %>%
   mutate(participant_id = row_number() + 33)
@@ -179,14 +179,9 @@ for (i in 1:4) {
     get_median_mean(c(i + 40))
 }
 
-
-1 5,6
-2 7,8
-3 9,10
-
 for (i in 13:20) {
   map_stats[which(map_stats$Country == dcau_maps[i-12]), 3:4] <- 
     get_median_mean(i)
 }
 
-for (i in 21:)
+#for (i in 21:)
