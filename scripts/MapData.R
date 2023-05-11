@@ -1,16 +1,17 @@
 library(tidyverse)
 
+rm(list = ls())
+
 # Get vector of file names
-filenames <- list.files("../map-data")
+filenames <- list.files("map-data")
 
 # Load all files
 for(i in filenames){
-  path <- file.path("..", "map-data", i)
+  path <- file.path("map-data", i)
   name <- substr(i, 1, nchar(i) - 4)
   df <- read_csv(path) %>% select(-Colour) %>% select(-1)
   assign(name, df)
 }
-
 remove(path, name, df, i, filenames)
 
 # Put all dataframes in a vector
@@ -27,8 +28,12 @@ num_admin_unit <- c()
 num_cols <- c()
 
 for (i in 1:length(dfs)){
+  print(i)
   name <- names(dfs)[i]
   tmp <- str_locate_all(name, "_")[[1]]
+  
+  print(tmp)
+  
   final_underscore <- as.vector(tmp)[length(tmp)]
   name <- str_sub(name, 1, final_underscore-1)
   name <- str_replace(name, "_pop", "")
@@ -77,22 +82,22 @@ time_cols = c("EstAU1Ti_Page Submit", "EstAu2Ti_Page Submit",
 
 gp1 <- read_csv("data/group1.csv") %>%
   slice(3:n()) %>%
-  select(time_cols) %>%
+  select(all_of(time_cols)) %>%
   mutate(participant_id = row_number())
 
 gp2 <- read_csv("data/group2.csv") %>%
   slice(3:n()) %>%
-  select(time_cols) %>%
+  select(all_of(time_cols)) %>%
   mutate(participant_id = row_number() + 11)
 
 gp3 <- read_csv("data/group3.csv") %>%
   slice(3:n()) %>%
-  select(time_cols) %>%
+  select(all_of(time_cols)) %>%
   mutate(participant_id = row_number() + 22)
 
 gp4 <- read_csv("data/group4.csv") %>%
   slice(3:n()) %>%
-  select(time_cols) %>%
+  select(all_of(time_cols)) %>%
   mutate(participant_id = row_number() + 33)
 
 all_participants <- rbind(gp1, gp2, gp3, gp4)
@@ -115,7 +120,7 @@ comzo_maps <- c("czech", "germany", "belgium", "luxembourg")
 cluau_maps <- c("nepal", "usa", "hungary", "argentina")
 ftau_maps <- c("saudi", "kazakhstan", "netherlands", "nigeria")
 
-get_median_mean <- function(col_nums) {
+get_median_mean <- function(col_num) {
   if (length(col_num) == 1)
     vec <- as.numeric(all_participants[[col_num]])
   else

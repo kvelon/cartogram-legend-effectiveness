@@ -102,12 +102,12 @@ data_for_group <- function(group_number) {
       )
     ) |>
     group_by(participant_id, task) |>
-    summarise(
+    reframe(
       time = sum(time),
       keep_answer = all(keep_answer),
       across(starts_with("Fam"), )
     ) |>
-    ungroup(participant_id, task) |>
+    # ungroup(participant_id, task) |>
     filter(keep_answer) |>
     mutate(group = group_number) |>
     select(group, participant_id, starts_with("fam"), task, time)

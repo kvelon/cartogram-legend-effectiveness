@@ -19,22 +19,22 @@ treatments <- c("None", "StLO", "StLG", "SeLG")
 #############################
 gp1 <- read_csv("data/group1.csv") %>%
   slice(3:n()) %>%
-  select(cluster) %>%
+  select(all_of(cluster)) %>%
   mutate(participant_id = row_number())
 
 gp2 <- read_csv("data/group2.csv") %>%
   slice(3:n()) %>%
-  select(cluster) %>%
+  select(all_of(cluster)) %>%
   mutate(participant_id = row_number() + 11)
 
 gp3 <- read_csv("data/group3.csv") %>%
   slice(3:n()) %>%
-  select(cluster) %>%
+  select(all_of(cluster)) %>%
   mutate(participant_id = row_number() + 22)
 
 gp4 <- read_csv("data/group4.csv") %>%
   slice(3:n()) %>%
-  select(cluster) %>%
+  select(all_of(cluster)) %>%
   mutate(participant_id = row_number() + 33)
 
 ###################################
