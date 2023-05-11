@@ -4,7 +4,7 @@ library(tidyverse)
 library(ggpubr)
 library(cowplot)
 library(rstatix)
-source("Util.R")
+source("scripts/Util.R")
 
 find_top <- c("FTAU1", "FTAU2",
               "FTAU3", "FTAU4",
@@ -16,22 +16,22 @@ treatments <- c("None", "StLO", "StLG", "SeLG")
 #############################
 # Read in data
 ###################################
-gp1 <- read_csv("../data/group1.csv") %>%
+gp1 <- read_csv("data/group1.csv") %>%
   slice(3:n()) %>%
   select(find_top) %>%
   mutate(participant_id = row_number())
 
-gp2 <- read_csv("../data/group2.csv") %>%
+gp2 <- read_csv("data/group2.csv") %>%
   slice(3:n()) %>%
   select(find_top) %>%
   mutate(participant_id = row_number() + 11)
 
-gp3 <- read_csv("../data/group3.csv") %>%
+gp3 <- read_csv("data/group3.csv") %>%
   slice(3:n()) %>%
   select(find_top) %>%
   mutate(participant_id = row_number() + 22)
 
-gp4 <- read_csv("../data/group4.csv") %>%
+gp4 <- read_csv("data/group4.csv") %>%
   slice(3:n()) %>%
   select(find_top) %>%
   mutate(participant_id = row_number() + 33)
